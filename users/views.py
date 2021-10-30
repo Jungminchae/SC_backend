@@ -6,6 +6,8 @@ from django.http import JsonResponse
 from django.contrib.auth import get_user_model
 from rest_framework.response import Response
 from rest_framework import status
+from rest_framework.decorators import api_view
+from rest_framework.generics import get_object_or_404
 from dj_rest_auth.registration.views import SocialLoginView
 from allauth.socialaccount.models import SocialAccount
 from allauth.socialaccount.providers.google.views import GoogleOAuth2Adapter
@@ -107,3 +109,44 @@ class GoogleLogin(SocialLoginView):
     adapter_class = GoogleOAuth2Adapter
     callback_url = GOOGLE_CALLBACK_URI
     client_class = OAuth2Client
+
+
+@api_view(["POST"])
+def user_follow(request):
+    username = request.data["username"]
+    follow_user = get_object_or_404(get_user_model(), username=username, is_active=True)
+    request.user.following_set.add(follow_user)
+    follow_user.follower_set.add(request.user)
+    return Response(status.HTTP_204_NO_CONTENT)
+
+
+@api_view(["POST"])
+def follow_user(request):
+    """
+    내가 팔로우 할 사람 이메일을 받아 -> 그 사람이 존재하는지 체크 ->
+    존재하면 팔로우, 존재하지 않으면 404
+    """
+    me = request.user
+    email = request.data["email"]
+    followed_user = get_object_or_404(get_user_model(), email=email, is_active=True)
+    # 내 팔로잉 목록에 추가
+    me.followings.add(followed_user)
+    # 상대방 팔로워 목록에 나 추가
+    followed_user.followers.add(me)
+    return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+@api_view(["POST"])
+def unfollow_user(request):
+    """
+    내가 언팔로우 할 사람 이메일을 받아 -> 그 사람이 존재하는지 체크 ->
+    존재하면 언팔로우, 존재하지 않으면 404
+    """
+    me = request.user
+    email = request.data["email"]
+    followed_user = get_object_or_404(get_user_model(), email=email, is_active=True)
+    # 내팔로잉 목록에서 제거
+    me.followings.remove(followed_user)
+    # 상대방 팔로워 목록에 나 제거
+    followed_user.followers.remove(me)
+    return Response(status=status.HTTP_204_NO_CONTENT)
