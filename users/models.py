@@ -39,6 +39,8 @@ class UserManager(BaseUserManager):
 class User(AbstractUser):
     username = None
     email = models.EmailField(unique=True, max_length=255)
+    followers = models.ManyToManyField("self", symmetrical=False)
+    followings = models.ManyToManyField("self", symmetrical=False)
 
     USERNAME_FIELD = "email"
     REQUIRED_FIELDS = []
