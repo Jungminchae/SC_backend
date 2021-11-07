@@ -32,14 +32,12 @@ def google_login(request):
 
 
 def google_callback(request):
-    client_id = GOOGLE_CLIENT_ID
-    client_secret = GOOGLE_SECRET
     code = request.GET.get("code")
     """
     Access Token Request
     """
     token_req = requests.post(
-        f"https://oauth2.googleapis.com/token?client_id={client_id}&client_secret={client_secret}&code={code}&grant_type=authorization_code&redirect_uri={GOOGLE_CALLBACK_URI}&state={STATE}"
+        f"https://oauth2.googleapis.com/token?client_id={GOOGLE_CLIENT_ID}&client_secret={GOOGLE_SECRET}&code={code}&grant_type=authorization_code&redirect_uri={GOOGLE_CALLBACK_URI}&state={STATE}"
     )
     token_req_json = token_req.json()
     error = token_req_json.get("error")
@@ -107,17 +105,6 @@ def google_callback(request):
 
 class GoogleLogin(SocialLoginView):
     adapter_class = GoogleOAuth2Adapter
-    callback_url = GOOGLE_CALLBACK_URI
-    client_class = OAuth2Client
-
-
-@api_view(["POST"])
-def user_follow(request):
-    username = request.data["username"]
-    follow_user = get_object_or_404(get_user_model(), username=username, is_active=True)
-    request.user.following_set.add(follow_user)
-    follow_user.follower_set.add(request.user)
-    return Response(status.HTTP_204_NO_CONTENT)
 
 
 @api_view(["POST"])

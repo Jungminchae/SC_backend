@@ -56,6 +56,7 @@ class Profile(models.Model):
         upload_to="users/avatar/%Y/%m/%d",
         help_text="png/jpg 파일을 업로드해주세요.",
     )
+    is_prof = models.BooleanField(default=False)
     followers = models.ManyToManyField(
         "self", symmetrical=False, blank=True, related_name="following"
     )
