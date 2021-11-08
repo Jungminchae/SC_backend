@@ -11,7 +11,6 @@ from rest_framework.generics import get_object_or_404
 from dj_rest_auth.registration.views import SocialLoginView
 from allauth.socialaccount.models import SocialAccount
 from allauth.socialaccount.providers.google.views import GoogleOAuth2Adapter
-from allauth.socialaccount.providers.oauth2.client import OAuth2Client
 
 
 STATE = settings.STATE
@@ -27,7 +26,8 @@ def google_login(request):
     """
     scope = "https://www.googleapis.com/auth/userinfo.email"
     return redirect(
-        f"https://accounts.google.com/o/oauth2/v2/auth?client_id={GOOGLE_CLIENT_ID}&response_type=code&redirect_uri={GOOGLE_CALLBACK_URI}&scope={scope}"
+        f"https://accounts.google.com/o/oauth2/v2/auth?client_id={GOOGLE_CLIENT_ID}"
+        f"&response_type=code&redirect_uri={GOOGLE_CALLBACK_URI}&scope={scope}"
     )
 
 
@@ -37,7 +37,10 @@ def google_callback(request):
     Access Token Request
     """
     token_req = requests.post(
-        f"https://oauth2.googleapis.com/token?client_id={GOOGLE_CLIENT_ID}&client_secret={GOOGLE_SECRET}&code={code}&grant_type=authorization_code&redirect_uri={GOOGLE_CALLBACK_URI}&state={STATE}"
+        f"https://oauth2.googleapis.com/token?client_id={GOOGLE_CLIENT_ID}"
+        f"&client_secret={GOOGLE_SECRET}"
+        f"&code={code}&grant_type=authorization_code&redirect_uri={GOOGLE_CALLBACK_URI}"
+        f"&state={STATE}"
     )
     token_req_json = token_req.json()
     error = token_req_json.get("error")
