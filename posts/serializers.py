@@ -24,8 +24,6 @@ class KnowHowPostSerializer(serializers.ModelSerializer):
             KnowHowPostImage.objects.create(post=instance, image=image_data)
         return instance
 
-    images = serializers.SerializerMethodField()
-
     def get_images(self, obj):
         image = obj.images.all()
         return KnowHowImageSerializer(instance=image, many=True).data
