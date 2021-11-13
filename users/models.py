@@ -1,6 +1,7 @@
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 from django.contrib.auth.models import AbstractUser, BaseUserManager
+from core.models import TimeStampModel
 
 
 class UserManager(BaseUserManager):
@@ -49,7 +50,7 @@ class User(AbstractUser):
         return self.email
 
 
-class Profile(models.Model):
+class Profile(TimeStampModel):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="profile")
     avatar = models.ImageField(
         blank=True,
@@ -63,3 +64,6 @@ class Profile(models.Model):
     followings = models.ManyToManyField(
         "self", symmetrical=False, blank=True, related_name="follwer"
     )
+
+    def like_counts(self):
+        return self.like.count()
