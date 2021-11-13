@@ -11,7 +11,7 @@ class KnowHowPost(TimeStampModel):
     )
     title = models.CharField(max_length=100)
     content = models.TextField()
-    like = models.ManyToManyField("users.Profile", related_name="like")
+    like = models.ManyToManyField("users.Profile", blank=True, related_name="like")
 
 
 class KnowHowPostImage(models.Model):
