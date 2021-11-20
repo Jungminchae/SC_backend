@@ -12,7 +12,7 @@ class KnowHowPost(TimeStampModel):
     title = models.CharField(max_length=100)
     content = models.TextField()
     like = models.ManyToManyField(
-        settings.AUTH_USER_MODEL, blank=True, related_name="like"
+        settings.AUTH_USER_MODEL, blank=True, related_name="like_set"
     )
 
 

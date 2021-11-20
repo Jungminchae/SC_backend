@@ -145,3 +145,5 @@ node_modules/
 
 migrations/
 _media/
+
+media/
