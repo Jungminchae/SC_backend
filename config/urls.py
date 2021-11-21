@@ -11,6 +11,7 @@ urlpatterns = [
     path("users/", include("users.urls")),
     path("identicons/image/<path:data>/", pydenticon_image, name="pydenticon_image"),
     path("posts/", include("posts.urls")),
+    path("comments/", include("comments.urls")),
 ]
 
 if settings.DEBUG:

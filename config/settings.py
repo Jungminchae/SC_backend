@@ -19,7 +19,7 @@ DEBUG = True
 
 ALLOWED_HOSTS = ["*"]
 
-PROJECT_APPS = ["users", "posts"]
+PROJECT_APPS = ["users", "posts", "comments"]
 THIRD_PARTY_APPS = [
     "rest_framework",
     "rest_framework_simplejwt.token_blacklist",
