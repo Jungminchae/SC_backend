@@ -1,5 +1,6 @@
 from django.db import models
 from django.conf import settings
+from taggit.managers import TaggableManager
 from core.models import TimeStampModel
 
 
@@ -14,6 +15,7 @@ class KnowHowPost(TimeStampModel):
     like = models.ManyToManyField(
         settings.AUTH_USER_MODEL, blank=True, related_name="like_set"
     )
+    tags = TaggableManager(blank=True)
 
 
 class KnowHowPostImage(models.Model):
@@ -31,6 +33,7 @@ class Photo(TimeStampModel):
     )
     photo = models.ImageField(upload_to="photo/images/%Y/%m/%d")
     description = models.CharField(max_length=255, default="")
+    tags = TaggableManager(blank=True)
 
 
 class Video(TimeStampModel):
@@ -39,6 +42,7 @@ class Video(TimeStampModel):
     )
     video = models.FileField(upload_to="video/videos/%Y/%m/%d")
     description = models.CharField(max_length=255, default="")
+    tags = TaggableManager(blank=True)
 
 
 class Bookmark(TimeStampModel):

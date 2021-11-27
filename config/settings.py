@@ -30,6 +30,7 @@ THIRD_PARTY_APPS = [
     "allauth.socialaccount",
     "allauth.socialaccount.providers.google",
     "django_pydenticon",
+    "taggit",
 ]
 
 # Application definition
