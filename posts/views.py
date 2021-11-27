@@ -11,7 +11,7 @@ from .serializers import (
     VideoSerializer,
     BookMarkSerializer,
 )
-from .permissions import IsMe
+from core.permissions import IsMe
 
 
 # TODO: 권한 설정
@@ -78,6 +78,21 @@ class PhotoViewSet(ModelViewSet):
         else:
             permission_classes = [IsMe]
         return [permission() for permission in permission_classes]
+
+    def create(self, request):
+        # 로그인 상태의 유저만 질문하기 가능 - 기본 permission IsAuthenticaåted
+        serializer = KnowHowPostSerializer(
+            data=request.data, context={"request": request}
+        )
+        # 유효성검사
+        if serializer.is_valid():
+            photo = serializer.save(
+                user=request.user,
+            )
+            photo_serialized_data = KnowHowPostSerializer(photo).data
+            return Response(data=photo_serialized_data, status=status.HTTP_201_CREATED)
+        else:
+            return Response(data=serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 class VideoViewSet(ModelViewSet):
