@@ -7,18 +7,40 @@ from django.contrib.auth import get_user_model
 from rest_framework.response import Response
 from rest_framework.permissions import AllowAny
 from rest_framework import status
+from rest_framework.viewsets import ModelViewSet
 from rest_framework.decorators import api_view
 from rest_framework.generics import get_object_or_404
 from dj_rest_auth.registration.views import SocialLoginView, RegisterView
 from allauth.socialaccount.models import SocialAccount
 from allauth.socialaccount.providers.google.views import GoogleOAuth2Adapter
-from .serializers import UserSerializer
+from .serializers import UserSerializer, ProfileSerializer
+from .models import Profile
 
 
 class SignupView(RegisterView):
     model = get_user_model()
     serializer_class = UserSerializer
     permission_classes = [AllowAny]
+
+
+class ProfileViewSet(ModelViewSet):
+    queryset = Profile.objects.all()
+    serializer_class = ProfileSerializer
+
+    def create(self, request):
+        data = request.data
+        serializer = self.get_serializer_class()
+        serializer = serializer(data=data)
+        if serializer.is_valid():
+            profile = serializer.save(
+                user=request.user,
+            )
+            profile_serializer = ProfileSerializer(profile)
+            return Response(profile_serializer.data, status=status.HTTP_201_CREATED)
+        else:
+            return Response(
+                profile_serializer.errors, status=status.HTTP_400_BAD_REQUEST
+            )
 
 
 STATE = settings.STATE

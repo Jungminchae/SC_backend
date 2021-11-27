@@ -8,5 +8,9 @@ class UserSerializer(RegisterSerializer):
 
 
 class ProfileSerializer(serializers.ModelSerializer):
+    user = UserSerializer(read_only=True)
+
     class Meta:
         model = Profile
+        fields = ("id", "user", "name", "avatar", "bio", "followers", "followings")
+        read_only_fields = ("id", "followers", "followings")

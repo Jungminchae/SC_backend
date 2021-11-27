@@ -1,11 +1,13 @@
 from rest_framework import serializers
 from taggit.serializers import TaggitSerializer, TagListSerializerField
+from users.serializers import UserSerializer
 from .models import KnowHowPost, Photo, PhotoImage, Video, Bookmark
 from .utils import tag_save
 
 
 # TODO: UserSerializer 추가해서 user의 이메일 정보 볼 수 있도록 변경
 class KnowHowPostSerializer(TaggitSerializer, serializers.ModelSerializer):
+    user = UserSerializer(read_only=True)
     is_like = serializers.SerializerMethodField("is_like_field")
     tags = TagListSerializerField()  # ["이렇게","저렇게"] 보내야함
 
@@ -35,6 +37,7 @@ class PhotoImageSerializer(serializers.ModelSerializer):
 
 # TODO: 사진과 동영상은 각각 크기는 어느 정도로?
 class PhotoSerializer(TaggitSerializer, serializers.ModelSerializer):
+    user = UserSerializer(read_only=True)
     images = serializers.SerializerMethodField()
     is_like = serializers.SerializerMethodField("is_like_field")
     tags = TagListSerializerField()  # ["이렇게","저렇게"] 보내야함
@@ -66,6 +69,7 @@ class PhotoSerializer(TaggitSerializer, serializers.ModelSerializer):
 
 
 class VideoSerializer(TaggitSerializer, serializers.ModelSerializer):
+    user = UserSerializer(read_only=True)
     is_like = serializers.SerializerMethodField("is_like_field")
     tags = TagListSerializerField()
 
@@ -87,6 +91,8 @@ class VideoSerializer(TaggitSerializer, serializers.ModelSerializer):
 
 
 class BookMarkSerializer(serializers.ModelSerializer):
+    user = UserSerializer(read_only=True)
+
     class Meta:
         model = Bookmark
         fields = ("id", "user", "name", "urls")
