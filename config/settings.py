@@ -23,12 +23,11 @@ PROJECT_APPS = ["users", "posts", "comments"]
 THIRD_PARTY_APPS = [
     "rest_framework",
     "rest_framework_simplejwt.token_blacklist",
-    "dj_rest_auth",
-    "dj_rest_auth.registration",
     "allauth",
     "allauth.account",
     "allauth.socialaccount",
     "allauth.socialaccount.providers.google",
+    "dj_rest_auth",
     "django_pydenticon",
     "taggit",
 ]
@@ -154,6 +153,8 @@ ACCOUNT_USER_MODEL_USERNAME_FIELD = None
 ACCOUNT_USERNAME_REQUIRED = False
 ACCOUNT_EMAIL_REQUIRED = True
 ACCOUNT_AUTHENTICATION_METHOD = "email"
+ACCOUNT_UNIQUE_EMAIL = True
+ACCOUNT_EMAIL_VERIFICATION = "none"
 
 REST_USE_JWT = True
 SIMPLE_JWT = {

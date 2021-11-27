@@ -5,12 +5,20 @@ from django.shortcuts import redirect
 from django.http import JsonResponse
 from django.contrib.auth import get_user_model
 from rest_framework.response import Response
+from rest_framework.permissions import AllowAny
 from rest_framework import status
 from rest_framework.decorators import api_view
 from rest_framework.generics import get_object_or_404
-from dj_rest_auth.registration.views import SocialLoginView
+from dj_rest_auth.registration.views import SocialLoginView, RegisterView
 from allauth.socialaccount.models import SocialAccount
 from allauth.socialaccount.providers.google.views import GoogleOAuth2Adapter
+from .serializers import UserSerializer
+
+
+class SignupView(RegisterView):
+    model = get_user_model()
+    serializer_class = UserSerializer
+    permission_classes = [AllowAny]
 
 
 STATE = settings.STATE
