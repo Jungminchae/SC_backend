@@ -141,32 +141,21 @@ class GoogleLogin(SocialLoginView):
 
 
 @api_view(["POST"])
-def follow_user(request):
-    """
-    내가 팔로우 할 사람 이메일을 받아 -> 그 사람이 존재하는지 체크 ->
-    존재하면 팔로우, 존재하지 않으면 404
-    """
+def toggle_follow(request):
     me = request.user
-    email = request.data["email"]
+    email = request.data.get("email")
     followed_user = get_object_or_404(get_user_model(), email=email, is_active=True)
-    # 내 팔로잉 목록에 추가
-    me.followings.add(followed_user)
-    # 상대방 팔로워 목록에 나 추가
-    followed_user.followers.add(me)
-    return Response(status=status.HTTP_204_NO_CONTENT)
 
+    following_user = Profile.objects.get(user=me)
+    followed_user = Profile.objects.get(user=followed_user)
 
-@api_view(["POST"])
-def unfollow_user(request):
-    """
-    내가 언팔로우 할 사람 이메일을 받아 -> 그 사람이 존재하는지 체크 ->
-    존재하면 언팔로우, 존재하지 않으면 404
-    """
-    me = request.user
-    email = request.data["email"]
-    followed_user = get_object_or_404(get_user_model(), email=email, is_active=True)
-    # 내팔로잉 목록에서 제거
-    me.followings.remove(followed_user)
-    # 상대방 팔로워 목록에 나 제거
-    followed_user.followers.remove(me)
-    return Response(status=status.HTTP_204_NO_CONTENT)
+    if (followed_user in following_user.followings.all()) and (
+        following_user in followed_user.followers.all()
+    ):
+        following_user.followings.remove(followed_user)
+        followed_user.followers.remove(following_user)
+        return Response(status=status.HTTP_204_NO_CONTENT)
+    else:
+        following_user.followings.add(followed_user)
+        followed_user.followers.add(following_user)
+        return Response(status=status.HTTP_204_NO_CONTENT)

@@ -6,6 +6,7 @@ from .views import (
     GoogleLogin,
     SignupView,
     ProfileViewSet,
+    toggle_follow,
 )
 
 router = DefaultRouter()
@@ -20,4 +21,5 @@ urlpatterns = [
         GoogleLogin.as_view(),
         name="google_login_todjango",
     ),
+    path("follows/", toggle_follow, name="toggle-follow"),
 ] + router.urls
