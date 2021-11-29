@@ -12,7 +12,13 @@ class KnowHowComment(TimeStampModel):
         related_name="knowhow_comments",
         on_delete=models.CASCADE,
     )
+    profile = models.ForeignKey(
+        "users.Profile", related_name="comments", on_delete=models.CASCADE
+    )
     comment = models.CharField(max_length=255)
+
+    class Meta:
+        ordering = ["-created_at"]
 
 
 class PhotoComment(TimeStampModel):
@@ -26,6 +32,9 @@ class PhotoComment(TimeStampModel):
     )
     comment = models.CharField(max_length=255)
 
+    class Meta:
+        ordering = ["-created_at"]
+
 
 class VideoComment(TimeStampModel):
     post = models.ForeignKey(
@@ -37,3 +46,6 @@ class VideoComment(TimeStampModel):
         on_delete=models.CASCADE,
     )
     comment = models.CharField(max_length=255)
+
+    class Meta:
+        ordering = ["-created_at"]

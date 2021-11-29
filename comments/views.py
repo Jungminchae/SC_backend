@@ -1,6 +1,8 @@
 from rest_framework.permissions import AllowAny
+from rest_framework.generics import get_object_or_404
 from rest_framework.viewsets import ModelViewSet
 from core.permissions import IsMe
+from posts.models import KnowHowPost, Photo, Video
 from .models import KnowHowComment, PhotoComment, VideoComment
 from .serializers import (
     KnowHowCommentSerializer,
@@ -20,8 +22,15 @@ class KnowHowCommentViewSet(ModelViewSet):
             permission_classes = [IsMe]
         return [permission() for permission in permission_classes]
 
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        queryset = queryset.filter(post__id=self.kwargs["post_id"])
+        return queryset
+
     def perform_create(self, serializer):
-        serializer.save(user=self.request.user)
+        post = get_object_or_404(KnowHowPost, id=self.kwargs["post_id"])
+        serializer.save(user=self.request.user, post=post)
+        return super().perform_create(serializer)
 
 
 class PhotoCommentViewSet(ModelViewSet):
@@ -35,8 +44,15 @@ class PhotoCommentViewSet(ModelViewSet):
             permission_classes = [IsMe]
         return [permission() for permission in permission_classes]
 
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        queryset = queryset.filter(post__id=self.kwargs["post_id"])
+        return queryset
+
     def perform_create(self, serializer):
-        serializer.save(user=self.request.user)
+        post = get_object_or_404(Photo, id=self.kwargs["post_id"])
+        serializer.save(user=self.request.user, post=post)
+        return super().perform_create(serializer)
 
 
 class VideoCommentViewSet(ModelViewSet):
@@ -50,5 +66,12 @@ class VideoCommentViewSet(ModelViewSet):
             permission_classes = [IsMe]
         return [permission() for permission in permission_classes]
 
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        queryset = queryset.filter(post__id=self.kwargs["post_id"])
+        return queryset
+
     def perform_create(self, serializer):
-        serializer.save(user=self.request.user)
+        post = get_object_or_404(Video, id=self.kwargs["post_id"])
+        serializer.save(user=self.request.user, post=post)
+        return super().perform_create(serializer)
