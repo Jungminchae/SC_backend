@@ -2,6 +2,7 @@ from django.db.models import Q
 from rest_framework.viewsets import ModelViewSet
 from rest_framework.decorators import action
 from rest_framework.response import Response
+from rest_framework.decorators import api_view
 from rest_framework.permissions import AllowAny
 from rest_framework import status
 from .models import KnowHowPost, Photo, Video, Bookmark
@@ -11,11 +12,10 @@ from .serializers import (
     VideoSerializer,
     BookMarkSerializer,
 )
+from .utils import like_or_unlike
 from core.permissions import IsMe
 
 
-# TODO: 권한 설정
-# 글보기: 누구나 가능, 글쓰기: 삭제, 수정: 나만 가능
 class KnowHowViewSet(ModelViewSet):
     queryset = KnowHowPost.objects.all()
     serializer_class = KnowHowPostSerializer
@@ -81,15 +81,13 @@ class PhotoViewSet(ModelViewSet):
 
     def create(self, request):
         # 로그인 상태의 유저만 질문하기 가능 - 기본 permission IsAuthenticaåted
-        serializer = KnowHowPostSerializer(
-            data=request.data, context={"request": request}
-        )
+        serializer = PhotoSerializer(data=request.data, context={"request": request})
         # 유효성검사
         if serializer.is_valid():
             photo = serializer.save(
                 user=request.user,
             )
-            photo_serialized_data = KnowHowPostSerializer(photo).data
+            photo_serialized_data = PhotoSerializer(photo).data
             return Response(data=photo_serialized_data, status=status.HTTP_201_CREATED)
         else:
             return Response(data=serializer.errors, status=status.HTTP_400_BAD_REQUEST)
@@ -106,9 +104,40 @@ class VideoViewSet(ModelViewSet):
             permission_classes = [IsMe]
         return [permission() for permission in permission_classes]
 
+    def create(self, request):
+        # 로그인 상태의 유저만 질문하기 가능 - 기본 permission IsAuthenticaåted
+        serializer = VideoSerializer(data=request.data, context={"request": request})
+        # 유효성검사
+        if serializer.is_valid():
+            photo = serializer.save(
+                user=request.user,
+            )
+            video_serialized_data = VideoSerializer(photo).data
+            return Response(data=video_serialized_data, status=status.HTTP_201_CREATED)
+        else:
+            return Response(data=serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
 
 # Bookmark 보기, 생성, 수정, 삭제 나만 가능
 class BookMarkViewSet(ModelViewSet):
     queryset = Bookmark
     serializer_class = BookMarkSerializer
     permission_classes = [IsMe]
+
+
+@api_view(["POST", "DELETE"])
+def like_knowhow(request, pk):
+    user = request.user
+    like_or_unlike(KnowHowPost, user, pk)
+
+
+@api_view(["POST", "DELETE"])
+def like_photo(request, pk):
+    user = request.user
+    like_or_unlike(Photo, user, pk)
+
+
+@api_view(["POST", "DELETE"])
+def like_video(request, pk):
+    user = request.user
+    like_or_unlike(Video, user, pk)
