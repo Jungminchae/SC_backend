@@ -3,6 +3,7 @@ from rest_framework.generics import get_object_or_404
 from rest_framework.viewsets import ModelViewSet
 from core.permissions import IsMe
 from posts.models import KnowHowPost, Photo, Video
+from users.models import Profile
 from .models import KnowHowComment, PhotoComment, VideoComment
 from .serializers import (
     KnowHowCommentSerializer,
@@ -28,8 +29,9 @@ class KnowHowCommentViewSet(ModelViewSet):
         return queryset
 
     def perform_create(self, serializer):
+        profile = get_object_or_404(Profile, user=self.request.user)
         post = get_object_or_404(KnowHowPost, id=self.kwargs["post_id"])
-        serializer.save(user=self.request.user, post=post)
+        serializer.save(user=self.request.user, post=post, profile=profile)
         return super().perform_create(serializer)
 
 
@@ -50,8 +52,9 @@ class PhotoCommentViewSet(ModelViewSet):
         return queryset
 
     def perform_create(self, serializer):
+        profile = get_object_or_404(Profile, user=self.request.user)
         post = get_object_or_404(Photo, id=self.kwargs["post_id"])
-        serializer.save(user=self.request.user, post=post)
+        serializer.save(user=self.request.user, post=post, profile=profile)
         return super().perform_create(serializer)
 
 
@@ -72,6 +75,7 @@ class VideoCommentViewSet(ModelViewSet):
         return queryset
 
     def perform_create(self, serializer):
+        profile = get_object_or_404(Profile, user=self.request.user)
         post = get_object_or_404(Video, id=self.kwargs["post_id"])
-        serializer.save(user=self.request.user, post=post)
+        serializer.save(user=self.request.user, post=post, profile=profile)
         return super().perform_create(serializer)
