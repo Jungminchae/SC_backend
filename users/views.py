@@ -9,7 +9,7 @@ from rest_framework.permissions import AllowAny
 from rest_framework import status
 from rest_framework.viewsets import ModelViewSet
 from rest_framework.decorators import api_view
-from rest_framework.generics import get_object_or_404
+from rest_framework.generics import get_object_or_404, ListAPIView
 from dj_rest_auth.registration.views import SocialLoginView, RegisterView
 from allauth.socialaccount.models import SocialAccount
 from allauth.socialaccount.providers.google.views import GoogleOAuth2Adapter
@@ -159,3 +159,15 @@ def toggle_follow(request):
         following_user.followings.add(followed_user)
         followed_user.followers.add(following_user)
         return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+class MyFollwingView(ListAPIView):
+    queryset = Profile.objects.all()
+    serializer_class = ProfileSerializer
+
+    def get_queryset(self):
+        user = self.request.user
+        if user.followings:
+            queryset = self.queryset.filter(user__in=user.followings)
+            return queryset
+        return super().get_queryset()

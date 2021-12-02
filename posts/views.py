@@ -118,7 +118,6 @@ class VideoViewSet(ModelViewSet):
             return Response(data=serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-# TODO: 남의 북마크는 못보고 내 북마크만 볼 수 있도록
 class BookMarkViewSet(ModelViewSet):
     queryset = Bookmark.objects.all()
     serializer_class = BookMarkSerializer
