@@ -4,6 +4,7 @@ from .views import (
     KnowHowViewSet,
     PhotoViewSet,
     VideoViewSet,
+    BookMarkViewSet,
     like_knowhow,
     like_photo,
     like_video,
@@ -13,6 +14,7 @@ router = DefaultRouter()
 router.register("knowhows", KnowHowViewSet)
 router.register("photos", PhotoViewSet)
 router.register("videos", VideoViewSet)
+router.register("bookmarks", BookMarkViewSet)
 
 urlpatterns = [
     path("knowhows/<int:pk>", like_knowhow, name="like-or-unlike-knowhow"),

@@ -1,9 +1,9 @@
 from django.db.models import Q
 from rest_framework.viewsets import ModelViewSet
-from rest_framework.decorators import action
+from rest_framework.decorators import action, permission_classes
 from rest_framework.response import Response
 from rest_framework.decorators import api_view
-from rest_framework.permissions import AllowAny
+from rest_framework.permissions import AllowAny, IsAdminUser
 from rest_framework import status
 from .models import KnowHowPost, Photo, Video, Bookmark
 from .serializers import (
@@ -118,11 +118,31 @@ class VideoViewSet(ModelViewSet):
             return Response(data=serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-# Bookmark 보기, 생성, 수정, 삭제 나만 가능
+# TODO: 남의 북마크는 못보고 내 북마크만 볼 수 있도록
 class BookMarkViewSet(ModelViewSet):
-    queryset = Bookmark
+    queryset = Bookmark.objects.all()
     serializer_class = BookMarkSerializer
-    permission_classes = [IsMe]
+
+    def get_permissions(self):
+        if self.action == "list" or self.action == "retrieve":
+            permission_classes = [IsAdminUser]
+        else:
+            permission_classes = [IsMe]
+        return [permission() for permission in permission_classes]
+
+    def perform_create(self, serializer):
+        serializer.save(user=self.request.user)
+        return super().perform_create(serializer)
+
+    @action(methods=["GET"], detail=False)
+    @permission_classes([IsMe])
+    def mine(self, request):
+        queryset = self.get_queryset().filter(user=self.request.user)
+        if queryset:
+            serializer = self.get_serializer(queryset, many=True)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        else:
+            return Response(status=status.HTTP_204_NO_CONTENT)
 
 
 @api_view(["POST", "DELETE"])
