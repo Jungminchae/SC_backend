@@ -32,21 +32,9 @@ class KnowHowViewSet(ModelViewSet):
         context["request"] = self.request
         return context
 
-    # Knowhow 쓰기
-    def create(self, request):
-        # 로그인 상태의 유저만 질문하기 가능 - 기본 permission IsAuthenticaåted
-        serializer = KnowHowPostSerializer(
-            data=request.data, context={"request": request}
-        )
-        # 유효성검사
-        if serializer.is_valid():
-            knowhow = serializer.save(
-                user=request.user,
-            )
-            knowhow_serializer = KnowHowPostSerializer(knowhow).data
-            return Response(data=knowhow_serializer, status=status.HTTP_201_CREATED)
-        else:
-            return Response(data=serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    def perform_create(self, serializer):
+        serializer.save(user=self.request.user)
+        return super().perform_create(serializer)
 
     @action(detail=False, methods=["GET"])
     def knowhow_search(self, request):
@@ -72,6 +60,11 @@ class PhotoViewSet(ModelViewSet):
     queryset = Photo.objects.all()
     serializer_class = PhotoSerializer
 
+    def get_serializer_context(self):
+        context = super().get_serializer_context()
+        context["request"] = self.request
+        return context
+
     def get_permissions(self):
         if self.action == "list" or self.action == "retrieve":
             permission_classes = [AllowAny]
@@ -79,18 +72,9 @@ class PhotoViewSet(ModelViewSet):
             permission_classes = [IsMe]
         return [permission() for permission in permission_classes]
 
-    def create(self, request):
-        # 로그인 상태의 유저만 질문하기 가능 - 기본 permission IsAuthenticaåted
-        serializer = PhotoSerializer(data=request.data, context={"request": request})
-        # 유효성검사
-        if serializer.is_valid():
-            photo = serializer.save(
-                user=request.user,
-            )
-            photo_serialized_data = PhotoSerializer(photo).data
-            return Response(data=photo_serialized_data, status=status.HTTP_201_CREATED)
-        else:
-            return Response(data=serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    def perform_create(self, serializer):
+        serializer.save(user=self.request.user)
+        return super().perform_create(serializer)
 
 
 class VideoViewSet(ModelViewSet):
@@ -104,18 +88,14 @@ class VideoViewSet(ModelViewSet):
             permission_classes = [IsMe]
         return [permission() for permission in permission_classes]
 
-    def create(self, request):
-        # 로그인 상태의 유저만 질문하기 가능 - 기본 permission IsAuthenticaåted
-        serializer = VideoSerializer(data=request.data, context={"request": request})
-        # 유효성검사
-        if serializer.is_valid():
-            photo = serializer.save(
-                user=request.user,
-            )
-            video_serialized_data = VideoSerializer(photo).data
-            return Response(data=video_serialized_data, status=status.HTTP_201_CREATED)
-        else:
-            return Response(data=serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    def get_serializer_context(self):
+        context = super().get_serializer_context()
+        context["request"] = self.request
+        return context
+
+    def perform_create(self, serializer):
+        serializer.save(user=self.request.user)
+        return super().perform_create(serializer)
 
 
 class BookMarkViewSet(ModelViewSet):
