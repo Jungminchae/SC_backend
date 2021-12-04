@@ -44,7 +44,14 @@ class PhotoSerializer(TaggitSerializer, serializers.ModelSerializer):
 
     class Meta:
         model = Photo
-        fields = ("id", "user", "photo", "is_like", "description", "tags")
+        fields = (
+            "id",
+            "user",
+            "images",
+            "is_like",
+            "description",
+            "tags",
+        )
         read_only_fields = ("id", "user")
 
     def is_like_field(self, post):
