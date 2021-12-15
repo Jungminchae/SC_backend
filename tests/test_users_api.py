@@ -14,7 +14,14 @@ def make_test_user():
     return user
 
 
+def make_test_user_and_profile(data):
+    user = make_test_user()
+    profile = mixer.blend(Profile, user=user, **data)
+    return user, profile
+
+
 # ------------------------------------#
+# 회원가입
 @pytest_mark
 def test_register_with_email(client):
     url = reverse("sign-up-email")
@@ -28,6 +35,8 @@ def test_register_with_email(client):
 
 
 # ------------------------------------#
+# profile
+# 프로필 생성
 @pytest_mark
 def test_make_profile_should_pass(client):
     user_1 = make_test_user()
@@ -40,6 +49,7 @@ def test_make_profile_should_pass(client):
     assert response.status_code == 201
 
 
+# 프로필 생성은 로그인 필요
 @pytest_mark
 def test_make_profile_should_not_pass(client):
     # login 없이 생성 불가
@@ -47,6 +57,26 @@ def test_make_profile_should_not_pass(client):
     data = {"name": "testmon", "bio": "안녕하세요!"}
     response = client.post(url, data)
     assert response.status_code == 403
+
+
+@pytest_mark
+def test_update_profile_should_pass(client):
+    user_1, profile_1 = make_test_user_and_profile({"avatar": None})
+    assert user_1 == profile_1.user
+    _id = profile_1.id
+    # login
+    client.force_login(user_1)
+    url = f"/users/profiles/{_id}/"
+    data = {"name": "testmonster"}
+    response = client.patch(path=url, data=data, content_type="application/json")
+    assert response.status_code == 200
+    assert response.json().get("name") == "testmonster"
+
+
+# TODO: 회원탈퇴 기획 not yet
+@pytest.mark.skip
+def test_delete_profile_is_withdrawal(client):
+    user_1, profile_1 = make_test_user_and_profile({"avatar": None})
 
 
 # ------------------------------------#
