@@ -4,7 +4,7 @@ from mixer.backend.django import mixer
 from rest_framework.reverse import reverse
 from users.models import Profile
 
-pytest_mark = pytest.mark.django_db
+pytestmark = pytest.mark.django_db
 
 
 def make_test_user():
@@ -22,7 +22,8 @@ def make_test_user_and_profile(data):
 
 # ------------------------------------#
 # 회원가입
-@pytest_mark
+
+
 def test_register_with_email(client):
     url = reverse("sign-up-email")
     data = {
@@ -37,7 +38,8 @@ def test_register_with_email(client):
 # ------------------------------------#
 # profile
 # 프로필 생성
-@pytest_mark
+
+
 def test_make_profile_should_pass(client):
     user_1 = make_test_user()
     client.force_login(user_1)
@@ -50,7 +52,8 @@ def test_make_profile_should_pass(client):
 
 
 # 프로필 생성은 로그인 필요
-@pytest_mark
+
+
 def test_make_profile_should_not_pass(client):
     # login 없이 생성 불가
     url = "/users/profiles/"
@@ -59,7 +62,6 @@ def test_make_profile_should_not_pass(client):
     assert response.status_code == 403
 
 
-@pytest_mark
 def test_update_profile_should_pass(client):
     user_1, profile_1 = make_test_user_and_profile({"avatar": None})
     assert user_1 == profile_1.user
@@ -80,7 +82,8 @@ def test_delete_profile_is_withdrawal(client):
 
 
 # ------------------------------------#
-@pytest_mark
+
+
 def test_follow_and_unfollow_user(client):
     # user & profile create
     user_1 = make_test_user()

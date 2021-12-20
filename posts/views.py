@@ -147,16 +147,19 @@ class BookMarkViewSet(ModelViewSet):
 @api_view(["POST", "DELETE"])
 def like_knowhow(request, pk):
     user = request.user
-    like_or_unlike(KnowHowPost, user, pk)
+    response = like_or_unlike(KnowHowPost, user, pk)
+    return response
 
 
 @api_view(["POST", "DELETE"])
 def like_photo(request, pk):
     user = request.user
-    like_or_unlike(Photo, user, pk)
+    response = like_or_unlike(Photo, user, pk)
+    return response
 
 
 @api_view(["POST", "DELETE"])
 def like_video(request, pk):
     user = request.user
-    like_or_unlike(Video, user, pk)
+    response = like_or_unlike(Video, user, pk)
+    return response

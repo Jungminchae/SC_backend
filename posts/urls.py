@@ -17,9 +17,9 @@ router.register("videos", VideoViewSet)
 router.register("bookmarks", BookMarkViewSet)
 
 urlpatterns = [
-    path("knowhows/<int:pk>", like_knowhow, name="like-or-unlike-knowhow"),
-    path("photos/<int:pk>", like_photo, name="like-or-unlike-photo"),
-    path("videos/<int:pk>", like_video, name="like-or-unlike-video"),
+    path("knowhows/likes/<int:pk>/", like_knowhow, name="like-or-unlike-knowhow"),
+    path("photos/likes/<int:pk>/", like_photo, name="like-or-unlike-photo"),
+    path("videos/likes/<int:pk>/", like_video, name="like-or-unlike-video"),
 ]
 
 urlpatterns += router.urls
