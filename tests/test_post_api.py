@@ -40,7 +40,7 @@ def test_all_my_knowhows_should_pass(client):
     assert False not in tests
 
 
-# knowhow 글쓰기
+# knowhow 글쓰기 - 전체공개
 def test_knowhow_post_should_pass(client):
     client = one_user_login(client)
     tags = json.dumps(["어그로", "짱짱"])
@@ -52,6 +52,27 @@ def test_knowhow_post_should_pass(client):
     }
     response = client.post(path=url, data=data)
     assert response.status_code == 201
+
+
+# knowhow 글쓰기 - 나만보기
+def test_knowhow_post_only_me_should_pass(client):
+    users, _ = make_many_users_and_profiles(2)
+    client.force_login(users[0])
+    tags = json.dumps(["테스트", "테스트1"])
+    url = "/posts/knowhows/"
+    data = {
+        "title": "이건 나만 보는 글이에요",
+        "content": "이건 나만 보는 글이에요",
+        "tags": tags,
+        "only_me": True,
+    }
+    response = client.post(path=url, data=data)
+    assert response.status_code == 200
+    # 다른 사람이 볼 수 없어야함
+    client.force_login(users[1])
+    url = "/posts/knowhows/1/"
+    response = client.get(path=url)
+    assert response.status_code == 403  #
 
 
 # knowhow 수정 - PUT
@@ -106,6 +127,18 @@ def test_knowhow_like_and_unlike_should_pass(client):
 
 
 # knowhow 카테고리별 필터링
+@pytest.mark.skip
+def test_knowhow_filter_by_category_should_pass(client):
+    # login
+    # 필터링 할 때 내 글은 보여야 할까?
+    client = one_user_login(client)
+    knowhows = mixer.cycle(50).blend(KnowHowPost)
+    category = "something"  # FIXME
+    url = f"/posts/knowhows?category={category}"
+    response = client.get(path=url)
+    assert response.status_code == 200
+    assert False not in [knowhow.category == category for knowhow in knowhows]
+
 
 # ------------------------------------#
 
