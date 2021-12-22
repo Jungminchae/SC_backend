@@ -67,7 +67,7 @@ def test_knowhow_post_only_me_should_pass(client):
         "only_me": True,
     }
     response = client.post(path=url, data=data)
-    assert response.status_code == 200
+    assert response.status_code == 201
     # 다른 사람이 볼 수 없어야함
     client.force_login(users[1])
     url = "/posts/knowhows/1/"
