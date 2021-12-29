@@ -13,7 +13,16 @@ class KnowHowPostSerializer(TaggitSerializer, serializers.ModelSerializer):
 
     class Meta:
         model = KnowHowPost
-        fields = ("id", "user", "title", "content", "is_like", "cover", "tags")
+        fields = (
+            "id",
+            "user",
+            "title",
+            "content",
+            "is_like",
+            "cover",
+            "tags",
+            "only_me",
+        )
 
     def is_like_field(self, post):
         if "request" in self.context:
@@ -44,14 +53,7 @@ class PhotoSerializer(TaggitSerializer, serializers.ModelSerializer):
 
     class Meta:
         model = Photo
-        fields = (
-            "id",
-            "user",
-            "images",
-            "is_like",
-            "description",
-            "tags",
-        )
+        fields = ("id", "user", "images", "is_like", "description", "tags", "only_me")
         read_only_fields = ("id", "user")
 
     def is_like_field(self, post):
@@ -82,7 +84,7 @@ class VideoSerializer(TaggitSerializer, serializers.ModelSerializer):
 
     class Meta:
         model = Video
-        fields = ("id", "user", "video", "is_like", "description", "tags")
+        fields = ("id", "user", "video", "is_like", "description", "tags", "only_me")
         read_only_fields = ("id", "user")
 
     def is_like_field(self, post):
