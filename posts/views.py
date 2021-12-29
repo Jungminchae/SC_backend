@@ -13,7 +13,7 @@ from .serializers import (
     BookMarkSerializer,
 )
 from .utils import like_or_unlike
-from core.permissions import IsMe
+from core.permissions import IsMe, IsOnlyMyPost
 
 
 class KnowHowViewSet(ModelViewSet):
@@ -21,11 +21,22 @@ class KnowHowViewSet(ModelViewSet):
     serializer_class = KnowHowPostSerializer
 
     def get_permissions(self):
-        if self.action == "list" or self.action == "retrieve":
+        if self.action == "list":
             permission_classes = [AllowAny]
+        elif self.action == "retrieve":
+            permission_classes = [IsOnlyMyPost]
         else:
             permission_classes = [IsMe]
         return [permission() for permission in permission_classes]
+
+    # "나만 보기" 설정한 유저의 글은 보이지 않음
+    def get_queryset(self):
+        if self.action == "list":
+            queryset = super().get_queryset()
+            queryset = queryset.select_related("user").filter(only_me=False)
+            return queryset
+        else:
+            return super().get_queryset()
 
     def get_serializer_context(self):
         context = super().get_serializer_context()
@@ -35,6 +46,10 @@ class KnowHowViewSet(ModelViewSet):
     def perform_create(self, serializer):
         serializer.save(user=self.request.user)
         return super().perform_create(serializer)
+
+    # 내글 모아보기
+    def all_my_posts(self, request):
+        pass
 
     @action(detail=False, methods=["GET"])
     def knowhow_search(self, request):
@@ -72,6 +87,12 @@ class PhotoViewSet(ModelViewSet):
             permission_classes = [IsMe]
         return [permission() for permission in permission_classes]
 
+    # "나만 보기" 설정한 유저의 글은 보이지 않음
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        queryset = queryset.select_related.filter(only_me=False)
+        return queryset
+
     def perform_create(self, serializer):
         serializer.save(user=self.request.user)
         return super().perform_create(serializer)
@@ -92,6 +113,12 @@ class VideoViewSet(ModelViewSet):
         context = super().get_serializer_context()
         context["request"] = self.request
         return context
+
+    # "나만 보기" 설정한 유저의 글은 보이지 않음
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        queryset = queryset.select_related.filter(only_me=False)
+        return queryset
 
     def perform_create(self, serializer):
         serializer.save(user=self.request.user)

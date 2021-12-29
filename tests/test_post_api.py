@@ -18,7 +18,7 @@ def make_many_users_and_profiles(user_num):
 def one_user_login(c):
     User = get_user_model()
     user_1 = mixer.blend(User, username=None)
-    profile_1 = mixer.blend(Profile, user=user_1)
+    _ = mixer.blend(Profile, user=user_1)
     c.force_login(user_1)
     return c
 
@@ -69,10 +69,18 @@ def test_knowhow_post_only_me_should_pass(client):
     response = client.post(path=url, data=data)
     assert response.status_code == 201
     # 다른 사람이 볼 수 없어야함
-    client.force_login(users[1])
-    url = "/posts/knowhows/1/"
+    # client.force_login(users[1])
+    # url = "/posts/knowhows/1/"
+    # response = client.get(path=url)
+    # assert response.status_code == 403  #
+
+
+def test_knowhow_other_people_see_only_me_should_not_pass(client):
+    post_1 = mixer.blend(KnowHowPost, only_me=True)
+    client = one_user_login(client)
+    url = f"/posts/knowhows/{post_1.id}/"
     response = client.get(path=url)
-    assert response.status_code == 403  #
+    assert response.status_code == 403
 
 
 # knowhow 수정 - PUT
