@@ -31,6 +31,7 @@ THIRD_PARTY_APPS = [
     "django_pydenticon",
     "taggit",
     "corsheaders",
+    "django_extensions",
 ]
 
 # Application definition
