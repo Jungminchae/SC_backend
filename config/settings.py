@@ -28,7 +28,6 @@ THIRD_PARTY_APPS = [
     "allauth.socialaccount",
     "allauth.socialaccount.providers.google",
     "dj_rest_auth",
-    "django_pydenticon",
     "taggit",
     "corsheaders",
     "django_extensions",
@@ -184,3 +183,5 @@ AUTHENTICATION_BACKENDS = [
     # `allauth` specific authentication methods, such as login by e-mail
     "allauth.account.auth_backends.AuthenticationBackend",
 ]
+
+SECURE_SSL_REDIRECT = False

@@ -48,8 +48,31 @@ class KnowHowViewSet(ModelViewSet):
         return super().perform_create(serializer)
 
     # 내글 모아보기
+    @action(
+        methods=["GET"],
+        detail=False,
+        url_path="all-my-knowhows",
+        permission_classes=[IsMe],
+    )
     def all_my_posts(self, request):
-        pass
+        queryset = super().get_queryset()
+
+        if request.GET.get("type") == "only_me":
+            queryset = queryset.select_related("user").filter(
+                user=request.user, only_me=True
+            )
+        else:
+            queryset = queryset.select_related("user").filter(user=request.user)
+
+        queryset = self.filter_queryset(queryset)
+
+        page = self.paginate_queryset(queryset)
+        if page is not None:
+            serializer = self.get_serializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
+
+        serializer = self.get_serializer(queryset, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
     @action(detail=False, methods=["GET"])
     def knowhow_search(self, request):

@@ -3,23 +3,9 @@ from django.contrib.auth import get_user_model
 from mixer.backend.django import mixer
 from rest_framework.reverse import reverse
 from users.models import Profile
+from tests.utils import make_test_user, make_test_user_and_profile
 
 pytestmark = pytest.mark.django_db
-
-
-def make_test_user():
-    user = get_user_model().objects.create_user(
-        email="test3355@admin.com", password="test1030911"
-    )
-    return user
-
-
-def make_test_user_and_profile(data):
-    user = make_test_user()
-    profile = mixer.blend(Profile, user=user, **data)
-    return user, profile
-
-
 # ------------------------------------#
 # 회원가입
 
