@@ -44,8 +44,11 @@ class KnowHowViewSet(ModelViewSet):
         return context
 
     def perform_create(self, serializer):
-        serializer.save(user=self.request.user)
-        return super().perform_create(serializer)
+        try:
+            serializer.save(user=self.request.user)
+            return super().perform_create(serializer)
+        except ValueError:
+            return serializer.error
 
     # 내글 모아보기
     @action(

@@ -1,8 +1,11 @@
+import tempfile
+import requests
 from django.contrib.auth import get_user_model
 from mixer.backend.django import mixer
 from users.models import Profile
 
 
+# 다수의 유저 리스트와 프로필 리스트 생성하기
 def make_many_users_and_profiles(user_num):
     User = get_user_model()
     user_list = mixer.cycle(user_num).blend(User, username=None)
@@ -10,6 +13,7 @@ def make_many_users_and_profiles(user_num):
     return user_list, profile_list
 
 
+# 1명의 유저 로그인
 def one_user_login(c):
     User = get_user_model()
     user_1 = mixer.blend(User, username=None)
@@ -18,11 +22,15 @@ def one_user_login(c):
     return c
 
 
+# TODO: 삭제
+# 1명의 유저만 로그인 profile X
 def get_user_login(c, user):
     c.force_login(user)
     return c
 
 
+# TODO: 삭제
+# 1명의 테스트 유저 생성
 def make_test_user():
     user = get_user_model().objects.create_user(
         email="test3355@admin.com", password="test1030911"
@@ -30,7 +38,18 @@ def make_test_user():
     return user
 
 
+# 1명의 유저와 프로필 만들기
 def make_test_user_and_profile(data):
     user = make_test_user()
     profile = mixer.blend(Profile, user=user, **data)
     return user, profile
+
+
+# 이미지 업로드 테스트용 이미지 가져오기 from picsum
+def get_dummy_image():
+    url = "https://picsum.photos/id/1/256/256"
+    image = requests.get(url)
+    with tempfile.NamedTemporaryFile(suffix=".jpg", dir="./") as f:
+        f.write(image.content)
+        byte_image = open(f.name, "rb")
+    return byte_image

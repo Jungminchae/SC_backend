@@ -2,7 +2,12 @@ import json
 import pytest
 from mixer.backend.django import mixer
 from posts.models import KnowHowPost, Bookmark
-from tests.utils import make_many_users_and_profiles, one_user_login, get_user_login
+from tests.utils import (
+    make_many_users_and_profiles,
+    one_user_login,
+    get_user_login,
+    get_dummy_image,
+)
 
 pytestmark = pytest.mark.django_db
 
@@ -16,6 +21,20 @@ def test_knowhow_post_should_pass(client):
         "title": "안녕하세요? 마케팅의 신이 되는 노하우를 알려드립니다",
         "content": "힝 속았지? 인간이 어떻게 신이 됩니까?",
         "tags": tags,
+    }
+    response = client.post(path=url, data=data)
+    assert response.status_code == 201
+
+
+def test_knowhow_post_with_cover_should_pass(client):
+    client = one_user_login(client)
+    tags = json.dumps(["어그로", "짱짱"])
+    url = "/posts/knowhows/"
+    data = {
+        "title": "안녕하세요? 커버이미지를 담은 테스트",
+        "content": "커버와 함께 쓰는 테스트",
+        "tags": tags,
+        "cover": get_dummy_image(),
     }
     response = client.post(path=url, data=data)
     assert response.status_code == 201
