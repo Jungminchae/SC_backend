@@ -1,43 +1,15 @@
 import json
 import pytest
-from django.contrib.auth import get_user_model
 from mixer.backend.django import mixer
-from users.models import Profile
-from posts.models import KnowHowPost
+from posts.models import KnowHowPost, Bookmark
+from tests.utils import (
+    make_many_users_and_profiles,
+    one_user_login,
+    get_user_login,
+    get_dummy_image,
+)
 
 pytestmark = pytest.mark.django_db
-
-
-def make_many_users_and_profiles(user_num):
-    User = get_user_model()
-    user_list = mixer.cycle(user_num).blend(User, username=None)
-    profile_list = [mixer.blend(Profile, user=user) for user in user_list]
-    return user_list, profile_list
-
-
-def one_user_login(c):
-    User = get_user_model()
-    user_1 = mixer.blend(User, username=None)
-    profile_1 = mixer.blend(Profile, user=user_1)
-    c.force_login(user_1)
-    return c
-
-
-def get_user_login(c, user):
-    c = c.force_login(user)
-    return c
-
-
-# knowhow 내가 쓴글만 모아보기
-@pytest.mark.skip
-def test_all_my_knowhows_should_pass(client):
-    client = one_user_login(client)
-    url = "/posts/knowhows/mine/"
-    response = client.get(url)
-    assert response.status_code == 200
-    my_posts = response.json()
-    tests = [response.wsgi_request.user == my_post.user for my_post in my_posts]
-    assert False not in tests
 
 
 # knowhow 글쓰기 - 전체공개
@@ -49,6 +21,20 @@ def test_knowhow_post_should_pass(client):
         "title": "안녕하세요? 마케팅의 신이 되는 노하우를 알려드립니다",
         "content": "힝 속았지? 인간이 어떻게 신이 됩니까?",
         "tags": tags,
+    }
+    response = client.post(path=url, data=data)
+    assert response.status_code == 201
+
+
+def test_knowhow_post_with_cover_should_pass(client):
+    client = one_user_login(client)
+    tags = json.dumps(["어그로", "짱짱"])
+    url = "/posts/knowhows/"
+    data = {
+        "title": "안녕하세요? 커버이미지를 담은 테스트",
+        "content": "커버와 함께 쓰는 테스트",
+        "tags": tags,
+        "cover": get_dummy_image(),
     }
     response = client.post(path=url, data=data)
     assert response.status_code == 201
@@ -68,11 +54,43 @@ def test_knowhow_post_only_me_should_pass(client):
     }
     response = client.post(path=url, data=data)
     assert response.status_code == 201
-    # 다른 사람이 볼 수 없어야함
-    client.force_login(users[1])
-    url = "/posts/knowhows/1/"
+
+
+# knowhow 나만 보기 글은 나만 볼 수 있음
+def test_knowhow_other_people_see_only_me_should_not_pass(client):
+    post_1 = mixer.blend(KnowHowPost, only_me=True)
+    client = one_user_login(client)
+    url = f"/posts/knowhows/{post_1.id}/"
     response = client.get(path=url)
-    assert response.status_code == 403  #
+    assert response.status_code == 403
+
+
+# knowhow 나의 글만 모아보기
+def test_knowhow_see_only_me_should_pass(client):
+    users, _ = make_many_users_and_profiles(2)
+    client.force_login(users[0])
+    # my posts
+    mixer.cycle(50).blend(KnowHowPost, user=users[0])
+    # other posts
+    mixer.cycle(50).blend(KnowHowPost, user=users[1])
+    url = "/posts/knowhows/all-my-knowhows/"
+    response = client.get(path=url)
+    assert response.status_code == 200
+    assert len(response.json()) == 50
+
+
+# knowhow "나만 보기" 글만 보기
+def test_all_my_knowhows_should_pass(client):
+    users, _ = make_many_users_and_profiles(1)
+    client.force_login(users[0])
+    url = "/posts/knowhows/all-my-knowhows/?type=only_me"
+    mixer.cycle(50).blend(KnowHowPost, user=users[0], only_me=True)
+    mixer.cycle(50).blend(KnowHowPost, user=users[0], only_me=False)
+    response = client.get(path=url, content_type="application/json", follow=True)
+    my_posts = response.json()
+    tests = [True is my_post["only_me"] for my_post in my_posts]
+    assert response.status_code == 200
+    assert False not in tests
 
 
 # knowhow 수정 - PUT
@@ -141,18 +159,6 @@ def test_knowhow_filter_by_category_should_pass(client):
 
 
 # ------------------------------------#
-
-# 북마크
-# 북마크 생성
-
-# 북마크 내 리스트 불러오기
-
-# 북마크 수정하기
-
-# 북마크 삭제하기
-
-# ------------------------------------#
-
 # 사진/동영상
 # 사진 올리기
 
@@ -170,4 +176,33 @@ def test_knowhow_filter_by_category_should_pass(client):
 
 # 동영상 수정
 # ------------------------------------#
-# 코멘트
+# 북마크
+# 북마크 생성
+@pytest.mark.skip
+def test_bookmark_make_should_pass(client):
+    post_1 = mixer.blend(KnowHowPost, only_me=False)
+    client = one_user_login(client)
+    url = "/posts/bookmarks/"
+    post_title = post_1.title
+    input_url = f"https://kairos-test.com/posts/{post_title}/"
+    data = {"name": post_title, "urls": input_url}
+    response = client.post(path=url, data=data)
+    assert response.status_code == 201
+
+
+# 북마크 내 리스트 불러오기
+def test_bookmark_list_should_pass(client):
+    users, _ = make_many_users_and_profiles(1)
+    mixer.cycle(10).blend(Bookmark, user=users[0])
+    url = "/posts/bookmarks/mine/"
+    client = get_user_login(client, users[0])
+    response = client.get(path=url)
+    assert response.status_code == 200
+
+
+# 북마크 수정하기
+
+
+# 북마크 삭제하기
+
+# ------------------------------------#

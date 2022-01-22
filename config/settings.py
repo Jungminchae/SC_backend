@@ -19,7 +19,7 @@ DEBUG = True
 
 ALLOWED_HOSTS = ["*"]
 
-PROJECT_APPS = ["users", "posts", "comments"]
+PROJECT_APPS = ["users", "posts", "comments", "mentors"]
 THIRD_PARTY_APPS = [
     "rest_framework",
     "rest_framework_simplejwt.token_blacklist",
@@ -28,9 +28,9 @@ THIRD_PARTY_APPS = [
     "allauth.socialaccount",
     "allauth.socialaccount.providers.google",
     "dj_rest_auth",
-    "django_pydenticon",
     "taggit",
     "corsheaders",
+    "django_extensions",
 ]
 
 # Application definition
@@ -183,3 +183,5 @@ AUTHENTICATION_BACKENDS = [
     # `allauth` specific authentication methods, such as login by e-mail
     "allauth.account.auth_backends.AuthenticationBackend",
 ]
+
+SECURE_SSL_REDIRECT = False

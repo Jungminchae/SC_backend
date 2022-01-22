@@ -2,7 +2,6 @@ from django.contrib import admin
 from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
-from django_pydenticon.views import image as pydenticon_image
 from rest_framework.permissions import AllowAny
 from drf_yasg import openapi
 from drf_yasg.views import get_schema_view
@@ -25,9 +24,9 @@ urlpatterns = [
     path("admin/", admin.site.urls),
     path("users/", include("dj_rest_auth.urls")),
     path("users/", include("users.urls")),
-    path("identicons/image/<path:data>/", pydenticon_image, name="pydenticon_image"),
     path("posts/", include("posts.urls")),
     path("comments/", include("comments.urls")),
+    path("mentors/", include("mentors.urls")),
 ]
 
 if settings.DEBUG:

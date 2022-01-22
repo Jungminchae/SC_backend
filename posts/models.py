@@ -8,7 +8,7 @@ class KnowHowPost(TimeStampModel):
     user = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         related_name="knowhow_profile",
-        on_delete=models.CASCADE,
+        on_delete=models.PROTECT,
     )
     title = models.CharField(max_length=100)
     cover = models.ImageField(
@@ -19,17 +19,21 @@ class KnowHowPost(TimeStampModel):
         settings.AUTH_USER_MODEL, blank=True, related_name="knowhow_like_set"
     )
     tags = TaggableManager(blank=True)
+    only_me = models.BooleanField(blank=True, default=False)
 
 
 class Photo(TimeStampModel):
     user = models.ForeignKey(
-        settings.AUTH_USER_MODEL, related_name="photo", on_delete=models.CASCADE
+        settings.AUTH_USER_MODEL,
+        related_name="photo",
+        on_delete=models.PROTECT,
     )
     description = models.CharField(max_length=255, default="")
     tags = TaggableManager(blank=True)
     like = models.ManyToManyField(
         settings.AUTH_USER_MODEL, blank=True, related_name="photo_like_set"
     )
+    only_me = models.BooleanField(blank=True, default=False)
 
 
 class PhotoImage(models.Model):
@@ -41,7 +45,9 @@ class PhotoImage(models.Model):
 
 class Video(TimeStampModel):
     user = models.ForeignKey(
-        settings.AUTH_USER_MODEL, related_name="video", on_delete=models.CASCADE
+        settings.AUTH_USER_MODEL,
+        related_name="video",
+        on_delete=models.PROTECT,
     )
     video = models.FileField(upload_to="video/videos/%Y/%m/%d")
     description = models.CharField(max_length=255, default="")
@@ -49,6 +55,7 @@ class Video(TimeStampModel):
     like = models.ManyToManyField(
         settings.AUTH_USER_MODEL, blank=True, related_name="video_like_set"
     )
+    only_me = models.BooleanField(blank=True, default=False)
 
 
 class Bookmark(TimeStampModel):
