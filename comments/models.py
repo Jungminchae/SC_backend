@@ -1,5 +1,6 @@
 from django.db import models
 from django.conf import settings
+from django.utils.translation import gettext_lazy as _
 from core.models import TimeStampModel
 
 
@@ -19,6 +20,11 @@ class KnowHowComment(TimeStampModel):
 
     class Meta:
         ordering = ["-created_at"]
+        verbose_name = _("노하우 게시판 댓글")
+        verbose_name_plural = _("노하우 게시판 댓글 관리")
+
+    def __str__(self):
+        return f"{self.post.id}번글의 댓글: {self.comment}"
 
 
 class PhotoComment(TimeStampModel):
@@ -34,6 +40,11 @@ class PhotoComment(TimeStampModel):
 
     class Meta:
         ordering = ["-created_at"]
+        verbose_name = _("사진 게시판 댓글")
+        verbose_name_plural = _("사진 게시판 댓글 관리")
+
+    def __str__(self):
+        return f"{self.post.id}번글의 댓글: {self.comment}"
 
 
 class VideoComment(TimeStampModel):
@@ -49,3 +60,8 @@ class VideoComment(TimeStampModel):
 
     class Meta:
         ordering = ["-created_at"]
+        verbose_name = _("동영상 게시판 댓글")
+        verbose_name_plural = _("동영상 게시판 댓글 관리")
+
+    def __str__(self):
+        return f"{self.post.id}번글의 댓글: {self.comment}"
