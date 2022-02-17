@@ -1,6 +1,6 @@
 from rest_framework.permissions import AllowAny
 from rest_framework.generics import get_object_or_404
-from rest_framework.viewsets import ModelViewSet
+from rest_framework.viewsets import GenericViewSet
 from core.permissions import IsMe
 from posts.models import KnowHowPost, Photo, Video
 from users.models import Profile
@@ -10,9 +10,11 @@ from .serializers import (
     PhotoCommentSerializer,
     VideoCommentSerializer,
 )
+from rest_framework.mixins import CreateModelMixin, ListModelMixin, UpdateModelMixin, DestroyModelMixin
 
 
-class KnowHowCommentViewSet(ModelViewSet):
+
+class KnowHowCommentViewSet(CreateModelMixin, ListModelMixin, UpdateModelMixin, DestroyModelMixin, GenericViewSet):
     queryset = KnowHowComment.objects.all()
     serializer_class = KnowHowCommentSerializer
 
@@ -35,7 +37,7 @@ class KnowHowCommentViewSet(ModelViewSet):
         return super().perform_create(serializer)
 
 
-class PhotoCommentViewSet(ModelViewSet):
+class PhotoCommentViewSet(CreateModelMixin, ListModelMixin, UpdateModelMixin, DestroyModelMixin, GenericViewSet):
     queryset = PhotoComment.objects.all()
     serializer_class = PhotoCommentSerializer
 
@@ -58,7 +60,7 @@ class PhotoCommentViewSet(ModelViewSet):
         return super().perform_create(serializer)
 
 
-class VideoCommentViewSet(ModelViewSet):
+class VideoCommentViewSet(CreateModelMixin, ListModelMixin, UpdateModelMixin, DestroyModelMixin, GenericViewSet):
     queryset = VideoComment.objects.all()
     serializer_class = VideoCommentSerializer
 
