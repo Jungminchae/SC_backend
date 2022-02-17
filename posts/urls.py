@@ -5,6 +5,7 @@ from .views import (
     PhotoViewSet,
     VideoViewSet,
     BookMarkViewSet,
+    AllPostView,
     like_knowhow,
     like_photo,
     like_video,
@@ -20,6 +21,7 @@ urlpatterns = [
     path("knowhows/likes/<int:pk>/", like_knowhow, name="like-or-unlike-knowhow"),
     path("photos/likes/<int:pk>/", like_photo, name="like-or-unlike-photo"),
     path("videos/likes/<int:pk>/", like_video, name="like-or-unlike-video"),
+    path("all/", AllPostView.as_view(), name="all-posts"),
 ]
 
 urlpatterns += router.urls

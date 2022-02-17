@@ -31,6 +31,7 @@ THIRD_PARTY_APPS = [
     "taggit",
     "corsheaders",
     "django_extensions",
+    "drf_multiple_model",
 ]
 
 # Application definition

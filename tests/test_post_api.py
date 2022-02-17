@@ -157,6 +157,10 @@ def test_knowhow_filter_by_category_should_pass(client):
     assert response.status_code == 200
     assert False not in [knowhow.category == category for knowhow in knowhows]
 
+def test_get_all_posts_should_pass(client):
+    url = "/posts/knowhows/"
+    response = client.get(path=url)
+    assert response.status_code == 200
 
 # ------------------------------------#
 # 사진/동영상
