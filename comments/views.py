@@ -1,16 +1,18 @@
 from rest_framework.permissions import AllowAny
 from rest_framework.generics import get_object_or_404
-from rest_framework.viewsets import GenericViewSet
+from rest_framework.viewsets import GenericViewSet, ViewSet
+from rest_framework.decorators import action
+from rest_framework.mixins import CreateModelMixin, ListModelMixin, UpdateModelMixin, DestroyModelMixin
 from core.permissions import IsMe
+from core.utils import like_or_unlike
 from posts.models import KnowHowPost, Photo, Video
 from users.models import Profile
-from .models import KnowHowComment, PhotoComment, VideoComment
-from .serializers import (
+from comments.models import KnowHowComment, PhotoComment, VideoComment
+from comments.serializers import (
     KnowHowCommentSerializer,
     PhotoCommentSerializer,
     VideoCommentSerializer,
 )
-from rest_framework.mixins import CreateModelMixin, ListModelMixin, UpdateModelMixin, DestroyModelMixin
 
 
 
@@ -36,6 +38,12 @@ class KnowHowCommentViewSet(CreateModelMixin, ListModelMixin, UpdateModelMixin, 
         serializer.save(user=self.request.user, post=post, profile=profile)
         return super().perform_create(serializer)
 
+    @action(detail=True, methods=["POST", "DELETE"], url_path="likes")
+    def like_knowhow_comment(self, request, post_id, pk):
+        user = request.user
+        response = like_or_unlike(KnowHowComment, user, pk)
+        return response
+
 
 class PhotoCommentViewSet(CreateModelMixin, ListModelMixin, UpdateModelMixin, DestroyModelMixin, GenericViewSet):
     queryset = PhotoComment.objects.all()
@@ -59,6 +67,12 @@ class PhotoCommentViewSet(CreateModelMixin, ListModelMixin, UpdateModelMixin, De
         serializer.save(user=self.request.user, post=post, profile=profile)
         return super().perform_create(serializer)
 
+    @action(detail=True, methods=["POST", "DELETE"], url_path="likes")
+    def like_photo_comment(self, request, pk):
+        user = request.user
+        response = like_or_unlike(PhotoComment, user, pk)
+        return response
+
 
 class VideoCommentViewSet(CreateModelMixin, ListModelMixin, UpdateModelMixin, DestroyModelMixin, GenericViewSet):
     queryset = VideoComment.objects.all()
@@ -81,3 +95,10 @@ class VideoCommentViewSet(CreateModelMixin, ListModelMixin, UpdateModelMixin, De
         post = get_object_or_404(Video, id=self.kwargs["post_id"])
         serializer.save(user=self.request.user, post=post, profile=profile)
         return super().perform_create(serializer)
+    
+    @action(detail=True, methods=["POST", "DELETE"], url_path="likes")
+    def like_video_comment(self, request, post_id, pk):
+        user = request.user
+        response = like_or_unlike(VideoComment, user, pk)
+        return response
+

@@ -184,5 +184,3 @@ AUTHENTICATION_BACKENDS = [
     # `allauth` specific authentication methods, such as login by e-mail
     "allauth.account.auth_backends.AuthenticationBackend",
 ]
-
-SECURE_SSL_REDIRECT = False

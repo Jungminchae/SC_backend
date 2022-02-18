@@ -1,8 +1,8 @@
 from rest_framework import serializers
 from taggit.serializers import TaggitSerializer, TagListSerializerField
 from users.serializers import UserSerializer
-from .models import KnowHowPost, KnowHowPostImage, Photo, PhotoImage, Video, Bookmark
-from .utils import tag_save
+from posts.models import KnowHowPost, KnowHowPostImage, Photo, PhotoImage, Video, Bookmark
+from core.utils import tag_save
 
 
 

@@ -13,7 +13,7 @@ from .serializers import (
     VideoSerializer,
     BookMarkSerializer,
 )
-from .utils import like_or_unlike
+from core.utils import like_or_unlike
 from core.permissions import IsMe, IsOnlyMyPost
 
 

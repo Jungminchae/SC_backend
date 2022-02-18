@@ -20,6 +20,12 @@ class KnowHowComment(TimeStampModel):
     )
     comment = models.CharField(max_length=255)
     parent = models.ForeignKey("self", related_name="replies", blank=True, null=True, on_delete=models.CASCADE)
+    like = models.ManyToManyField(
+        settings.AUTH_USER_MODEL,
+        blank=True,
+        related_name="knowhow_comment_like",
+        verbose_name=_("노하우 댓글 좋아요"),
+    )
 
     class Meta:
         ordering = ["-created_at"]
@@ -44,6 +50,12 @@ class PhotoComment(TimeStampModel):
     )
     comment = models.CharField(max_length=255)
     parent = models.ForeignKey("self", related_name="replies", blank=True, null=True, on_delete=models.CASCADE)
+    like = models.ManyToManyField(
+        settings.AUTH_USER_MODEL,
+        blank=True,
+        related_name="photo_comment_like",
+        verbose_name=_("사진 댓글 좋아요"),
+    )
 
     class Meta:
         ordering = ["-created_at"]
@@ -68,6 +80,12 @@ class VideoComment(TimeStampModel):
     )
     comment = models.CharField(max_length=255)
     parent = models.ForeignKey("self", related_name="replies", blank=True, null=True, on_delete=models.CASCADE)
+    like = models.ManyToManyField(
+        settings.AUTH_USER_MODEL,
+        blank=True,
+        related_name="video_comment_like",
+        verbose_name=_("동영상 댓글 좋아요"),
+    )
 
     class Meta:
         ordering = ["-created_at"]
