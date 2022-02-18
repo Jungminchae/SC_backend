@@ -5,6 +5,7 @@ from rest_framework.response import Response
 from rest_framework.decorators import api_view
 from rest_framework.permissions import AllowAny, IsAdminUser
 from rest_framework import status
+from drf_multiple_model.views import ObjectMultipleModelAPIView
 from .models import KnowHowPost, Photo, Video, Bookmark
 from .serializers import (
     KnowHowPostSerializer,
@@ -12,7 +13,7 @@ from .serializers import (
     VideoSerializer,
     BookMarkSerializer,
 )
-from .utils import like_or_unlike
+from core.utils import like_or_unlike
 from core.permissions import IsMe, IsOnlyMyPost
 
 
@@ -77,24 +78,24 @@ class KnowHowViewSet(ModelViewSet):
         serializer = self.get_serializer(queryset, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
-    @action(detail=False, methods=["GET"])
-    def knowhow_search(self, request):
-        keyword = request.GET.get("keyword", None)
-        # 제목 or 내용에 keyword가 포함된 object 필터링
-        knowhow_list = KnowHowPost.objects.filter(
-            Q(title__contains=keyword) | Q(content__contains=keyword)
-        )
+    # @action(detail=False, methods=["GET"])
+    # def knowhow_search(self, request):
+    #     keyword = request.GET.get("keyword", None)
+    #     # 제목 or 내용에 keyword가 포함된 object 필터링
+    #     knowhow_list = KnowHowPost.objects.filter(
+    #         Q(title__contains=keyword) | Q(content__contains=keyword)
+    #     )
 
-        # paginator
-        paginator = self.paginator
+    #     # paginator
+    #     paginator = self.paginator
 
-        # 필터 되어 검색된 것이 있으면 return
-        if len(knowhow_list):
-            result = paginator.paginate_queryset(knowhow_list, request)
-            serializer = KnowHowPostSerializer(result, many=True).data
-            return paginator.get_paginated_response(serializer)
-        else:
-            return Response(status=status.HTTP_204_NO_CONTENT)
+    #     # 필터 되어 검색된 것이 있으면 return
+    #     if len(knowhow_list):
+    #         result = paginator.paginate_queryset(knowhow_list, request)
+    #         serializer = KnowHowPostSerializer(result, many=True).data
+    #         return paginator.get_paginated_response(serializer)
+    #     else:
+    #         return Response(status=status.HTTP_204_NO_CONTENT)
 
 
 class PhotoViewSet(ModelViewSet):
@@ -120,9 +121,11 @@ class PhotoViewSet(ModelViewSet):
         return queryset
 
     def perform_create(self, serializer):
-        serializer.save(user=self.request.user)
-        return super().perform_create(serializer)
-
+        try:
+            serializer.save(user=self.request.user)
+            return super().perform_create(serializer)
+        except ValueError:
+            return serializer.error
 
 class VideoViewSet(ModelViewSet):
     queryset = Video.objects.all()
@@ -147,8 +150,11 @@ class VideoViewSet(ModelViewSet):
         return queryset
 
     def perform_create(self, serializer):
-        serializer.save(user=self.request.user)
-        return super().perform_create(serializer)
+        try:
+            serializer.save(user=self.request.user)
+            return super().perform_create(serializer)
+        except ValueError:
+            return serializer.error
 
 
 class BookMarkViewSet(ModelViewSet):
@@ -163,8 +169,11 @@ class BookMarkViewSet(ModelViewSet):
         return [permission() for permission in permission_classes]
 
     def perform_create(self, serializer):
-        serializer.save(user=self.request.user)
-        return super().perform_create(serializer)
+        try:
+            serializer.save(user=self.request.user)
+            return super().perform_create(serializer)
+        except ValueError:
+            return serializer.error
 
     @action(methods=["GET"], detail=False)
     @permission_classes([IsMe])
@@ -175,6 +184,16 @@ class BookMarkViewSet(ModelViewSet):
             return Response(serializer.data, status=status.HTTP_200_OK)
         else:
             return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+class AllPostView(ObjectMultipleModelAPIView):
+    querylist = [
+        {"queryset": KnowHowPost.objects.all().select_related("user").filter(only_me=False), "serializer_class": KnowHowPostSerializer},
+        {"queryset": Photo.objects.all(), "serializer_class": PhotoSerializer},
+        {"queryset": Video.objects.all(), "serializer_class": VideoSerializer},
+    ]
+    permission_classes = [AllowAny]
+
 
 
 @api_view(["POST", "DELETE"])

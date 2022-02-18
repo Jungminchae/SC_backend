@@ -31,6 +31,7 @@ THIRD_PARTY_APPS = [
     "taggit",
     "corsheaders",
     "django_extensions",
+    "drf_multiple_model",
 ]
 
 # Application definition
@@ -183,5 +184,3 @@ AUTHENTICATION_BACKENDS = [
     # `allauth` specific authentication methods, such as login by e-mail
     "allauth.account.auth_backends.AuthenticationBackend",
 ]
-
-SECURE_SSL_REDIRECT = False

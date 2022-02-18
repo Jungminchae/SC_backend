@@ -36,6 +36,21 @@ class KnowHowPost(TimeStampModel):
     def __str__(self):
         return self.title
 
+class KnowHowPostImage(models.Model):
+    post = models.ForeignKey(
+        KnowHowPost,
+        on_delete=models.CASCADE,
+        related_name="knowhow_image",
+        verbose_name=_("노하우 포스트"),
+    )
+    image = models.ImageField(
+        blank=True, null=True, upload_to="photo/images/knowhow_images/%Y/%m/%d", verbose_name=_("노하우 이미지")
+    )
+
+    class Meta:
+        verbose_name = _("노하우 사진 파일")
+        verbose_name_plural = _("노하우 사진 파일 관리")
+
 
 class Photo(TimeStampModel):
     user = models.ForeignKey(
@@ -68,10 +83,10 @@ class PhotoImage(models.Model):
         Photo,
         on_delete=models.CASCADE,
         related_name="photo_image",
-        verbose_name=_("포스트"),
+        verbose_name=_("사진 포스트"),
     )
     image = models.ImageField(
-        blank=True, null=True, upload_to="photo/images/%Y/%m/%d", verbose_name=_("사진")
+        blank=True, null=True, upload_to="photo/images/photo_images/%Y/%m/%d", verbose_name=_("사진")
     )
 
     class Meta:

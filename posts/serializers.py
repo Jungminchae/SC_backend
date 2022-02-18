@@ -1,14 +1,23 @@
 from rest_framework import serializers
 from taggit.serializers import TaggitSerializer, TagListSerializerField
 from users.serializers import UserSerializer
-from .models import KnowHowPost, Photo, PhotoImage, Video, Bookmark
-from .utils import tag_save
+from posts.models import KnowHowPost, KnowHowPostImage, Photo, PhotoImage, Video, Bookmark
+from core.utils import tag_save
 
+
+
+class KnowhowImageSerializer(serializers.ModelSerializer):
+    image = serializers.ImageField(use_url=True)
+
+    class Meta:
+        model = KnowHowPostImage
+        fields = ("image",)
 
 # TODO: UserSerializer 추가해서 user의 이메일 정보 볼 수 있도록 변경
 class KnowHowPostSerializer(TaggitSerializer, serializers.ModelSerializer):
     user = UserSerializer(read_only=True)
     is_like = serializers.SerializerMethodField("is_like_field")
+    images = serializers.SerializerMethodField()
     tags = TagListSerializerField()  # ["이렇게","저렇게"] 보내야함
 
     class Meta:
@@ -22,7 +31,14 @@ class KnowHowPostSerializer(TaggitSerializer, serializers.ModelSerializer):
             "cover",
             "tags",
             "only_me",
+            "images"
         )
+
+    def get_images(self, obj):
+        image = obj.knowhow_image.all()
+        return KnowhowImageSerializer(
+            instance=image, many=True, context=self.context
+        ).data
 
     def is_like_field(self, post):
         if "request" in self.context:
