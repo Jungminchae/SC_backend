@@ -15,7 +15,6 @@ from comments.serializers import (
 )
 
 
-
 class KnowHowCommentViewSet(CreateModelMixin, ListModelMixin, UpdateModelMixin, DestroyModelMixin, GenericViewSet):
     queryset = KnowHowComment.objects.all()
     serializer_class = KnowHowCommentSerializer
