@@ -1,5 +1,6 @@
 from django.db import models
 from django.conf import settings
+from django.dispatch import receiver
 from django.utils.translation import gettext_lazy as _
 from core.models import TimeStampModel
 from comments.utils import change_to_deleted_user
@@ -16,7 +17,7 @@ class KnowHowComment(TimeStampModel):
         on_delete=models.CASCADE,
     )
     profile = models.ForeignKey(
-        "users.Profile", related_name="knowhow_comments", on_delete=models.SET(change_to_deleted_user)
+        "users.Profile", related_name="knowhow_comments", on_delete=models.SET_NULL, null=True
     )
     comment = models.CharField(max_length=255)
     parent = models.ForeignKey("self", related_name="replies", blank=True, null=True, on_delete=models.CASCADE)
