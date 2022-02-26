@@ -46,7 +46,7 @@ def make_test_user_and_profile(data):
 
 
 # 이미지 업로드 테스트용 이미지 가져오기 from picsum
-def get_dummy_image():
+def get_dummy_image(image_number):
     url = "https://picsum.photos/id/1/256/256"
     image = requests.get(url)
     with tempfile.NamedTemporaryFile(suffix=".jpg", dir="./") as f:

@@ -34,7 +34,7 @@ def test_knowhow_post_with_cover_should_pass(client):
         "title": "안녕하세요? 커버이미지를 담은 테스트",
         "content": "커버와 함께 쓰는 테스트",
         "tags": tags,
-        "cover": get_dummy_image(),
+        "cover": get_dummy_image(1),
     }
     response = client.post(path=url, data=data)
     assert response.status_code == 201

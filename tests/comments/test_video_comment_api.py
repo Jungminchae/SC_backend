@@ -2,74 +2,66 @@ import json
 import pytest
 from django.contrib.auth import get_user_model
 from mixer.backend.django import mixer
-from posts.models import KnowHowPost
-from comments.models import KnowHowComment
+from posts.models import Video
+from comments.models import VideoComment
 from tests.utils import (
     make_many_users_and_profiles,
     one_user_login,
     get_user_login,
+    get_dummy_image,
 )
 
 pytestmark = pytest.mark.django_db
 
-def test_knowhow_comment_after_profile_deleted():
-    comment = mixer.blend(KnowHowComment)
-    comment_id = comment.id
-    profile = comment.profile
-    profile.delete()
 
-    comment = KnowHowComment.objects.get(id=comment_id)
-
-    assert comment.profile == None
-
-
-def test_get_all_knowhow_comment_with_login_should_pass(client):
+def test_get_all_video_comment_with_login_should_pass(client):
     client = one_user_login(client)
-    knowhow = mixer.blend(KnowHowPost)
-    mixer.cycle(50).blend(KnowHowComment, post=knowhow)
+    video = mixer.blend(Video)
+    mixer.cycle(50).blend(VideoComment, post=video)
 
-    url = f"/comments/knowhows/{knowhow.id}/"
-    response = client.get(url)
-    
-    assert response.status_code == 200
-    assert len(response.json()) == 50
-
-def test_get_all_knowhow_comment_without_login_should_pass(client):
-    knowhow = mixer.blend(KnowHowPost)
-    mixer.cycle(50).blend(KnowHowComment, post=knowhow)
-
-    url = f"/comments/knowhows/{knowhow.id}/"
+    url = f"/comments/videos/{video.id}/"
     response = client.get(url)
     
     assert response.status_code == 200
     assert len(response.json()) == 50
 
 
-def test_create_knowhow_comment_should_pass(client):
+def test_get_all_video_comment_without_login_should_pass(client):
+    video = mixer.blend(Video)
+    mixer.cycle(50).blend(VideoComment, post=video)
+
+    url = f"/comments/videos/{video.id}/"
+    response = client.get(url)
+    
+    assert response.status_code == 200
+    assert len(response.json()) == 50
+
+
+def test_create_video_comment_should_pass(client):
     client = one_user_login(client)
-    # Knowhow 글 작성
-    knowhow = mixer.blend(KnowHowPost)
+    # video 글 작성
+    video = mixer.blend(Video)
     # comment 작성
-    url = f"/comments/knowhows/{knowhow.id}/"
+    url = f"/comments/videos/{video.id}/"
     data = {
-        "post": knowhow.id,
+        "post": video.id,
         "comment": "댓글을 작성했습니다"
     }
     response = client.post(url, data)
     assert response.status_code == 201
     assert response.json()["comment"] == data["comment"]
 
-def test_edit_knowhow_comment_should_pass(client):
+def test_edit_video_comment_should_pass(client):
     # login
     User = get_user_model()
     user_1 = mixer.blend(User, username=None)
     client.force_login(user_1)
-    # Knowhow 글 작성
-    knowhow = mixer.blend(KnowHowPost)
+    # video 글 작성
+    video = mixer.blend(Video)
     # comment 작성
-    comment = mixer.blend(KnowHowComment, post=knowhow, user=user_1)
+    comment = mixer.blend(VideoComment, post=video, user=user_1)
 
-    url = f"/comments/knowhows/{knowhow.id}/{comment.id}/"
+    url = f"/comments/videos/{video.id}/{comment.id}/"
     data = {
         "comment": "댓글을 수정했습니다"
     }
@@ -77,26 +69,26 @@ def test_edit_knowhow_comment_should_pass(client):
     assert response.status_code == 200
     assert response.json()["comment"] == data["comment"]
 
-def test_delete_knowhow_comment_should_pass(client):
+def test_delete_video_comment_should_pass(client):
     # login
     User = get_user_model()
     user_1 = mixer.blend(User, username=None)
     client.force_login(user_1)
-    # Knowhow 글 작성
-    knowhow = mixer.blend(KnowHowPost)
+    # video 글 작성
+    video = mixer.blend(Video)
     # comment 작성
-    comment = mixer.blend(KnowHowComment, post=knowhow, user=user_1)
-    url = f"/comments/knowhows/{knowhow.id}/{comment.id}/"
+    comment = mixer.blend(VideoComment, post=video, user=user_1)
+    url = f"/comments/videos/{video.id}/{comment.id}/"
     response = client.delete(url)
     assert response.status_code == 204
 
-def test_create_knowhow_reply_should_pass(client):
+def test_create_video_reply_should_pass(client):
     client = one_user_login(client)
-    knowhow = mixer.blend(KnowHowPost)
-    comment = mixer.blend(KnowHowComment, post=knowhow)
-    url = f"/comments/knowhows/{knowhow.id}/"
+    video = mixer.blend(Video)
+    comment = mixer.blend(VideoComment, post=video)
+    url = f"/comments/videos/{video.id}/"
     data = {
-        "post": knowhow.id,
+        "post": video.id,
         "comment": "답글을 작성했습니다",
         "parent": comment.id
     }
@@ -104,19 +96,19 @@ def test_create_knowhow_reply_should_pass(client):
     assert response.status_code == 201
     assert response.json()["comment"] == data["comment"]
 
-def test_edit_knowhow_reply_should_pass(client):
+def test_edit_video_reply_should_pass(client):
     # login
     User = get_user_model()
     user_1 = mixer.blend(User, username=None)
     client.force_login(user_1)
     
-    knowhow = mixer.blend(KnowHowPost)
+    video = mixer.blend(Video)
     # 댓글 생성
-    comment_1 = mixer.blend(KnowHowComment, post=knowhow)
+    comment_1 = mixer.blend(VideoComment, post=video)
     # 답글 생성
-    comment_2 = mixer.blend(KnowHowComment, post=knowhow, user=user_1)
+    comment_2 = mixer.blend(VideoComment, post=video, user=user_1)
 
-    url = f"/comments/knowhows/{knowhow.id}/{comment_2.id}/"
+    url = f"/comments/videos/{video.id}/{comment_2.id}/"
     data = {
         "comment": "답글을 수정했습니다",
     }
@@ -124,29 +116,29 @@ def test_edit_knowhow_reply_should_pass(client):
     assert response.status_code == 200
     assert response.json()["comment"] == data["comment"]
 
-def test_delete_knowhow_reply_should_pass(client):
+def test_delete_video_reply_should_pass(client):
     # login
     User = get_user_model()
     user_1 = mixer.blend(User, username=None)
     client.force_login(user_1)
     
-    knowhow = mixer.blend(KnowHowPost)
+    video = mixer.blend(Video)
     # 댓글 생성
-    comment_1 = mixer.blend(KnowHowComment, post=knowhow)
+    comment_1 = mixer.blend(VideoComment, post=video)
     # 답글 생성
-    comment_2 = mixer.blend(KnowHowComment, post=knowhow, user=user_1)
+    comment_2 = mixer.blend(VideoComment, post=video, user=user_1)
 
-    url = f"/comments/knowhows/{knowhow.id}/{comment_2.id}/"
+    url = f"/comments/videos/{video.id}/{comment_2.id}/"
     response = client.delete(url)
     assert response.status_code == 204
 
-def test_do_like_and_unlike_knowhow_comment_should_pass(client):
+def test_do_like_and_unlike_video_comment_should_pass(client):
     client = one_user_login(client)
 
-    knowhow = mixer.blend(KnowHowPost)
-    comment = mixer.blend(KnowHowComment, post=knowhow)
+    video = mixer.blend(Video)
+    comment = mixer.blend(VideoComment, post=video)
 
-    url = f"/comments/knowhows/{knowhow.id}/{comment.id}/likes/"
+    url = f"/comments/videos/{video.id}/{comment.id}/likes/"
     # 좋아요
     response = client.post(url)
     assert response.status_code == 201
