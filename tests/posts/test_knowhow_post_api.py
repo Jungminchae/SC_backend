@@ -1,11 +1,10 @@
 import json
 import pytest
 from mixer.backend.django import mixer
-from posts.models import KnowHowPost, Bookmark
+from posts.models import KnowHowPost
 from tests.utils import (
     make_many_users_and_profiles,
     one_user_login,
-    get_user_login,
     get_dummy_image,
 )
 
@@ -157,56 +156,8 @@ def test_knowhow_filter_by_category_should_pass(client):
     assert response.status_code == 200
     assert False not in [knowhow.category == category for knowhow in knowhows]
 
+
 def test_get_all_posts_should_pass(client):
     url = "/posts/knowhows/"
     response = client.get(path=url)
     assert response.status_code == 200
-
-# ------------------------------------#
-# 사진/동영상
-# 사진 올리기
-
-# 사진 삭제
-
-# 내 사진 보기
-
-# 사진 수정
-
-# 동영상 올리기
-
-# 동영상 삭제
-
-# 내 동영상 보기
-
-# 동영상 수정
-# ------------------------------------#
-# 북마크
-# 북마크 생성
-@pytest.mark.skip
-def test_bookmark_make_should_pass(client):
-    post_1 = mixer.blend(KnowHowPost, only_me=False)
-    client = one_user_login(client)
-    url = "/posts/bookmarks/"
-    post_title = post_1.title
-    input_url = f"https://kairos-test.com/posts/{post_title}/"
-    data = {"name": post_title, "urls": input_url}
-    response = client.post(path=url, data=data)
-    assert response.status_code == 201
-
-
-# 북마크 내 리스트 불러오기
-def test_bookmark_list_should_pass(client):
-    users, _ = make_many_users_and_profiles(1)
-    mixer.cycle(10).blend(Bookmark, user=users[0])
-    url = "/posts/bookmarks/mine/"
-    client = get_user_login(client, users[0])
-    response = client.get(path=url)
-    assert response.status_code == 200
-
-
-# 북마크 수정하기
-
-
-# 북마크 삭제하기
-
-# ------------------------------------#
