@@ -36,6 +36,7 @@ class KnowHowPost(TimeStampModel):
     def __str__(self):
         return self.title
 
+
 class KnowHowPostImage(models.Model):
     post = models.ForeignKey(
         KnowHowPost,
@@ -44,7 +45,10 @@ class KnowHowPostImage(models.Model):
         verbose_name=_("노하우 포스트"),
     )
     image = models.ImageField(
-        blank=True, null=True, upload_to="photo/images/knowhow_images/%Y/%m/%d", verbose_name=_("노하우 이미지")
+        blank=True,
+        null=True,
+        upload_to="photo/images/knowhow_images/%Y/%m/%d",
+        verbose_name=_("노하우 이미지"),
     )
 
     class Meta:
@@ -86,7 +90,10 @@ class PhotoImage(models.Model):
         verbose_name=_("사진 포스트"),
     )
     image = models.ImageField(
-        blank=True, null=True, upload_to="photo/images/photo_images/%Y/%m/%d", verbose_name=_("사진")
+        blank=True,
+        null=True,
+        upload_to="photo/images/photo_images/%Y/%m/%d",
+        verbose_name=_("사진"),
     )
 
     class Meta:
@@ -128,7 +135,7 @@ class Bookmark(TimeStampModel):
         on_delete=models.CASCADE,
         verbose_name=_("회원"),
     )
-    name = models.CharField(max_length=20, default="나의 북마크", verbose_name=_("북마크"))
+    name = models.CharField(max_length=200, default="나의 북마크", verbose_name=_("북마크"))
     urls = models.URLField(verbose_name=_("링크"))
 
     def __str__(self):

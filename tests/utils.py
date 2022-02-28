@@ -53,3 +53,10 @@ def get_dummy_image(image_number):
         f.write(image.content)
         byte_image = open(f.name, "rb")
     return byte_image
+
+
+def get_user_and_client_login(client):
+    User = get_user_model()
+    user_1 = mixer.blend(User, username=None)
+    client.force_login(user_1)
+    return user_1
