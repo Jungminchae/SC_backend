@@ -1,4 +1,3 @@
-from django.db.models import Q
 from rest_framework.viewsets import ModelViewSet
 from rest_framework.decorators import action, permission_classes
 from rest_framework.response import Response
@@ -49,7 +48,7 @@ class KnowHowViewSet(ModelViewSet):
             serializer.save(user=self.request.user)
             return super().perform_create(serializer)
         except ValueError:
-            return serializer.error
+            return serializer.errors
 
     # 내글 모아보기
     @action(
@@ -117,7 +116,7 @@ class PhotoViewSet(ModelViewSet):
     # "나만 보기" 설정한 유저의 글은 보이지 않음
     def get_queryset(self):
         queryset = super().get_queryset()
-        queryset = queryset.select_related.filter(only_me=False)
+        queryset = queryset.select_related("user").filter(only_me=False)
         return queryset
 
     def perform_create(self, serializer):
@@ -125,7 +124,8 @@ class PhotoViewSet(ModelViewSet):
             serializer.save(user=self.request.user)
             return super().perform_create(serializer)
         except ValueError:
-            return serializer.error
+            return serializer.errors
+
 
 class VideoViewSet(ModelViewSet):
     queryset = Video.objects.all()
@@ -154,7 +154,7 @@ class VideoViewSet(ModelViewSet):
             serializer.save(user=self.request.user)
             return super().perform_create(serializer)
         except ValueError:
-            return serializer.error
+            return serializer.errors
 
 
 class BookMarkViewSet(ModelViewSet):
@@ -173,7 +173,7 @@ class BookMarkViewSet(ModelViewSet):
             serializer.save(user=self.request.user)
             return super().perform_create(serializer)
         except ValueError:
-            return serializer.error
+            return serializer.errors
 
     @action(methods=["GET"], detail=False)
     @permission_classes([IsMe])
@@ -188,12 +188,16 @@ class BookMarkViewSet(ModelViewSet):
 
 class AllPostView(ObjectMultipleModelAPIView):
     querylist = [
-        {"queryset": KnowHowPost.objects.all().select_related("user").filter(only_me=False), "serializer_class": KnowHowPostSerializer},
+        {
+            "queryset": KnowHowPost.objects.all()
+            .select_related("user")
+            .filter(only_me=False),
+            "serializer_class": KnowHowPostSerializer,
+        },
         {"queryset": Photo.objects.all(), "serializer_class": PhotoSerializer},
         {"queryset": Video.objects.all(), "serializer_class": VideoSerializer},
     ]
     permission_classes = [AllowAny]
-
 
 
 @api_view(["POST", "DELETE"])

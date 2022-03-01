@@ -1,5 +1,4 @@
 import pytest
-from django.contrib.auth import get_user_model
 from mixer.backend.django import mixer
 from posts.models import KnowHowPost, Bookmark
 from tests.utils import (
@@ -36,11 +35,9 @@ def test_bookmark_list_should_pass(client):
 
 
 def test_partial_update_bookmark_name_should_pass(client):
-    User = get_user_model()
-    user_1 = mixer.blend(User, username=None)
-    client.force_login(user_1)
+    logged_in_user = get_user_and_client_login(client)
 
-    bookmark_1 = mixer.blend(Bookmark, user=user_1)
+    bookmark_1 = mixer.blend(Bookmark, user=logged_in_user)
     url = f"/posts/bookmarks/{bookmark_1.id}/"
     data = {"name": "북마크 이름 변경 테스트"}
     response = client.patch(path=url, data=data, content_type="application/json")
@@ -48,11 +45,9 @@ def test_partial_update_bookmark_name_should_pass(client):
 
 
 def test_partial_update_bookmark_url_should_pass(client):
-    User = get_user_model()
-    user_1 = mixer.blend(User, username=None)
-    client.force_login(user_1)
+    logged_in_user = get_user_and_client_login(client)
 
-    bookmark_1 = mixer.blend(Bookmark, user=user_1)
+    bookmark_1 = mixer.blend(Bookmark, user=logged_in_user)
     url = f"/posts/bookmarks/{bookmark_1.id}/"
     data = {"url": "https://kairos-test.com/sexy-bookmark"}
     response = client.patch(path=url, data=data, content_type="application/json")
@@ -60,11 +55,9 @@ def test_partial_update_bookmark_url_should_pass(client):
 
 
 def test_partial_update_bookmark_name_and_url_should_pass(client):
-    User = get_user_model()
-    user_1 = mixer.blend(User, username=None)
-    client.force_login(user_1)
+    logged_in_user = get_user_and_client_login(client)
 
-    bookmark_1 = mixer.blend(Bookmark, user=user_1)
+    bookmark_1 = mixer.blend(Bookmark, user=logged_in_user)
     url = f"/posts/bookmarks/{bookmark_1.id}/"
     data = {"name": "북마크 이름 변경 테스트", "url": "https://kairos-test.com/sexy-bookmark"}
     response = client.patch(path=url, data=data, content_type="application/json")
