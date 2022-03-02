@@ -29,6 +29,9 @@ def test_create_one_photo_post_should_pass(client):
     }
 
     response = client.post(path=url, data=data)
+
+    save_photo = PhotoImage.objects.all()
+    assert len(save_photo) == 1
     assert response.status_code == 201
 
 
@@ -70,6 +73,20 @@ def test_create_photo_post_without_description_should_pass(client):
 
     response = client.post(path=url, data=data)
     assert response.status_code == 201
+
+
+def test_get_all_photo_posts_should_pass(client):
+    client = one_user_login(client)
+
+    url = "/posts/photos/"
+    photos = mixer.cycle(50).blend(Photo)
+    for photo in photos:
+        mixer.blend(PhotoImage, post=photo)
+
+    response = client.get(path=url)
+
+    assert len(response.json()) == 50
+    assert response.status_code == 200
 
 
 @pytest.mark.skip("원인 파악 필요")
