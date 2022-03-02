@@ -5,6 +5,7 @@ from tests.utils import (
     make_many_users_and_profiles,
     one_user_login,
     get_user_login,
+    get_user_and_client_login,
 )
 
 pytestmark = pytest.mark.django_db
@@ -12,13 +13,12 @@ pytestmark = pytest.mark.django_db
 
 # 북마크
 # 북마크 생성
-@pytest.mark.skip
 def test_bookmark_make_should_pass(client):
     post_1 = mixer.blend(KnowHowPost, only_me=False)
     client = one_user_login(client)
     url = "/posts/bookmarks/"
     post_title = post_1.title
-    input_url = f"https://kairos-test.com/posts/{post_title}/"
+    input_url = "https://kairos-test.com"
     data = {"name": post_title, "urls": input_url}
     response = client.post(path=url, data=data)
     assert response.status_code == 201
@@ -32,3 +32,42 @@ def test_bookmark_list_should_pass(client):
     client = get_user_login(client, users[0])
     response = client.get(path=url)
     assert response.status_code == 200
+
+
+def test_partial_update_bookmark_name_should_pass(client):
+    logged_in_user = get_user_and_client_login(client)
+
+    bookmark_1 = mixer.blend(Bookmark, user=logged_in_user)
+    url = f"/posts/bookmarks/{bookmark_1.id}/"
+    data = {"name": "북마크 이름 변경 테스트"}
+    response = client.patch(path=url, data=data, content_type="application/json")
+    assert response.status_code == 200
+
+
+def test_partial_update_bookmark_url_should_pass(client):
+    logged_in_user = get_user_and_client_login(client)
+
+    bookmark_1 = mixer.blend(Bookmark, user=logged_in_user)
+    url = f"/posts/bookmarks/{bookmark_1.id}/"
+    data = {"url": "https://kairos-test.com/sexy-bookmark"}
+    response = client.patch(path=url, data=data, content_type="application/json")
+    assert response.status_code == 200
+
+
+def test_partial_update_bookmark_name_and_url_should_pass(client):
+    logged_in_user = get_user_and_client_login(client)
+
+    bookmark_1 = mixer.blend(Bookmark, user=logged_in_user)
+    url = f"/posts/bookmarks/{bookmark_1.id}/"
+    data = {"name": "북마크 이름 변경 테스트", "url": "https://kairos-test.com/sexy-bookmark"}
+    response = client.patch(path=url, data=data, content_type="application/json")
+    assert response.status_code == 200
+
+
+def test_delete_bookmark_should_pass(client):
+    logged_in_user = get_user_and_client_login(client)
+
+    bookmark_1 = mixer.blend(Bookmark, user=logged_in_user)
+    url = f"/posts/bookmarks/{bookmark_1.id}/"
+    response = client.delete(path=url)
+    assert response.status_code == 204

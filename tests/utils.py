@@ -1,5 +1,8 @@
+import random
+import string
 import tempfile
 import requests
+from django.core.files.uploadedfile import SimpleUploadedFile
 from django.contrib.auth import get_user_model
 from mixer.backend.django import mixer
 from users.models import Profile
@@ -47,9 +50,26 @@ def make_test_user_and_profile(data):
 
 # 이미지 업로드 테스트용 이미지 가져오기 from picsum
 def get_dummy_image(image_number):
-    url = "https://picsum.photos/id/1/256/256"
+    url = f"https://picsum.photos/id/{image_number}/256/256"
     image = requests.get(url)
     with tempfile.NamedTemporaryFile(suffix=".jpg", dir="./") as f:
         f.write(image.content)
         byte_image = open(f.name, "rb")
     return byte_image
+
+
+def get_simple_uploaded_file():
+    fake_name = "".join(
+        [random.choice(string.ascii_letters + string.digits) for _ in range(10)]
+    )
+    uploaded_photo = SimpleUploadedFile(
+        f"{fake_name}.jpeg", b"file_content", content_type="multipart/form-data"
+    )
+    return uploaded_photo
+
+
+def get_user_and_client_login(client):
+    User = get_user_model()
+    user_1 = mixer.blend(User, username=None)
+    client.force_login(user_1)
+    return user_1
