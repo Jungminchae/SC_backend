@@ -49,12 +49,15 @@ class Profile(TimeStampModel):
         verbose_name=_("팔로잉"),
     )
 
-    def like_counts(self):
-        return self.like.count()
-
     def __str__(self):
         return self.user.email
 
     class Meta:
         verbose_name = _("회원 프로필 목록")
         verbose_name_plural = _("회원 프로필 목록")
+
+
+class EmailAuthenticationKey(models.Model):
+    email = models.EmailField(_("이메일"), max_length=254)
+    key = models.CharField(max_length=255)
+    created_at = models.DateTimeField(auto_now_add=True)

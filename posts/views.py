@@ -77,25 +77,6 @@ class KnowHowViewSet(ModelViewSet):
         serializer = self.get_serializer(queryset, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
-    # @action(detail=False, methods=["GET"])
-    # def knowhow_search(self, request):
-    #     keyword = request.GET.get("keyword", None)
-    #     # 제목 or 내용에 keyword가 포함된 object 필터링
-    #     knowhow_list = KnowHowPost.objects.filter(
-    #         Q(title__contains=keyword) | Q(content__contains=keyword)
-    #     )
-
-    #     # paginator
-    #     paginator = self.paginator
-
-    #     # 필터 되어 검색된 것이 있으면 return
-    #     if len(knowhow_list):
-    #         result = paginator.paginate_queryset(knowhow_list, request)
-    #         serializer = KnowHowPostSerializer(result, many=True).data
-    #         return paginator.get_paginated_response(serializer)
-    #     else:
-    #         return Response(status=status.HTTP_204_NO_CONTENT)
-
 
 class PhotoViewSet(ModelViewSet):
     queryset = Photo.objects.all()
