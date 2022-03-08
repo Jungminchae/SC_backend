@@ -13,7 +13,7 @@ urlpatterns = [
     path("users/", include("dj_rest_auth.urls")),
     path("users/", include("users.urls")),
     path("posts/", include("posts.urls")),
-    path("comments/", include("comments.urls")),
+    path("", include("comments.urls")),
     path("mentors/", include("mentors.urls")),
 ]
 

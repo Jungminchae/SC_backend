@@ -19,6 +19,7 @@ from core.permissions import IsMe, IsOnlyMyPost
 class KnowHowViewSet(ModelViewSet):
     queryset = KnowHowPost.objects.all()
     serializer_class = KnowHowPostSerializer
+    lookup_field = "id"
 
     def get_permissions(self):
         if self.action == "list":
@@ -81,6 +82,7 @@ class KnowHowViewSet(ModelViewSet):
 class PhotoViewSet(ModelViewSet):
     queryset = Photo.objects.all()
     serializer_class = PhotoSerializer
+    lookup_field = "id"
 
     def get_serializer_context(self):
         context = super().get_serializer_context()
@@ -111,6 +113,7 @@ class PhotoViewSet(ModelViewSet):
 class VideoViewSet(ModelViewSet):
     queryset = Video.objects.all()
     serializer_class = VideoSerializer
+    lookup_field = "id"
 
     def get_permissions(self):
         if self.action == "list" or self.action == "retrieve":

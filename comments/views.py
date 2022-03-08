@@ -29,6 +29,7 @@ class KnowHowCommentViewSet(
 ):
     queryset = KnowHowComment.objects.all()
     serializer_class = KnowHowCommentSerializer
+    lookup_field = "id"
 
     def get_permissions(self):
         if self.action == "list":
@@ -64,6 +65,7 @@ class PhotoCommentViewSet(
 ):
     queryset = PhotoComment.objects.all()
     serializer_class = PhotoCommentSerializer
+    lookup_field = "id" 
 
     def get_permissions(self):
         if self.action == "list":
@@ -99,7 +101,8 @@ class VideoCommentViewSet(
 ):
     queryset = VideoComment.objects.all()
     serializer_class = VideoCommentSerializer
-
+    lookup_field = "id"
+    
     def get_permissions(self):
         if self.action == "list":
             permission_classes = [AllowAny]

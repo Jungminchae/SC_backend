@@ -1,12 +1,25 @@
-from rest_framework.routers import DefaultRouter
-from .views import KnowHowCommentViewSet, PhotoCommentViewSet, VideoCommentViewSet
+from django.urls import include, path
+from posts.views import KnowHowViewSet, PhotoViewSet, VideoViewSet
+from comments.views import (
+    KnowHowCommentViewSet,
+    PhotoCommentViewSet,
+    VideoCommentViewSet,
+)
+from comments.routers import SimpleNestedURL
 
-router = DefaultRouter()
-router.register(r"knowhows/(?P<post_id>\d+)", KnowHowCommentViewSet)
-router.register(r"photos/(?P<post_id>\d+)", PhotoCommentViewSet)
-router.register(r"videos/(?P<post_id>\d+)", VideoCommentViewSet)
-
+knowhow_comment_router = SimpleNestedURL(
+    KnowHowViewSet, KnowHowCommentViewSet, "knowhows", "comments", "post"
+)
+photo_comment_router = SimpleNestedURL(
+    PhotoViewSet, PhotoCommentViewSet, "photos", "comments", "post"
+)
+video_comment_router = SimpleNestedURL(
+    VideoViewSet, VideoCommentViewSet, "videos", "comments", "post"
+)
 
 urlpatterns = []
-
-urlpatterns += router.urls
+urlpatterns = (
+    knowhow_comment_router.get_nested_registered_urls()
+    + photo_comment_router.get_nested_registered_urls()
+    + video_comment_router.get_nested_registered_urls()
+)
