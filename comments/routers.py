@@ -1,4 +1,3 @@
-from cgitb import lookup
 from rest_framework.routers import SimpleRouter
 from rest_framework_nested import routers
 
